@@ -1,0 +1,6 @@
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\CardMaker.exe.config
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\CardMaker.exe
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\CardMaker.pdb
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\obj\Debug\CardMaker.csprojResolveAssemblyReference.cache
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\obj\Debug\CardMaker.exe
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\obj\Debug\CardMaker.pdb
