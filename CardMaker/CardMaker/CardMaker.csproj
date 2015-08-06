@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Bilinear.cs" />
     <Compile Include="OneFiveOrderPoly.cs" />
+    <Compile Include="Perspective.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

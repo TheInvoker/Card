@@ -24,7 +24,7 @@ namespace CardMaker
 
             
             List<Shape> OriginalShapes = SquareDetector.FindSquare("test.png");
-            List<Shape> WarpedSquares = SquareDetector.FindSquare("warp2.png");
+            List<Shape> WarpedSquares = SquareDetector.FindSquare("warp3.png");
 
             List<KeyValuePair<Shape, Shape>> ShapeList = new List<KeyValuePair<Shape, Shape>>();
             foreach (Shape shape in OriginalShapes)
@@ -36,7 +36,8 @@ namespace CardMaker
 
 
             //Transformer transformer = new OneFiveOrderPoly();
-            Transformer transformer = new Bilinear();
+            //Transformer transformer = new Bilinear();
+            Transformer transformer = new Perspective();
 
             Bitmap logo = new Bitmap("logotest.png");
             Bitmap flag = new Bitmap(logo.Width, logo.Height);
