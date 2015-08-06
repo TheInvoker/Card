@@ -25,6 +25,11 @@ namespace CardMaker
             bottomrightpixel = corners.First(p => p.GetX() >= centerx && p.GetY() >= centery);
         }
 
+        public List<Pixel> GetPixels()
+        {
+            return pixels;
+        }
+
         public Pixel GetTopLeftPixel()
         {
             return topleftpixel;

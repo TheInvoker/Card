@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.Windows;
 
 namespace CardMaker
 {
@@ -25,9 +22,9 @@ namespace CardMaker
             //FindDark("shirt.png");
 
 
-
+            
             List<Shape> OriginalShapes = SquareDetector.FindSquare("test.png");
-            List<Shape> WarpedSquares = SquareDetector.FindSquare("warp3.png");
+            List<Shape> WarpedSquares = SquareDetector.FindSquare("warp2.png");
 
             List<KeyValuePair<Shape, Shape>> ShapeList = new List<KeyValuePair<Shape, Shape>>();
             foreach (Shape shape in OriginalShapes)
@@ -35,12 +32,26 @@ namespace CardMaker
                 Shape warpedShape = WarpedSquares.First(x => x.GetTopLeftPixel().GetColor().Equals(shape.GetTopLeftPixel().GetColor()));
                 ShapeList.Add(new KeyValuePair<Shape, Shape>(shape, warpedShape));
             }
-
             Console.WriteLine(string.Format("Found {0} shape pairs", ShapeList.Count));
 
-            //Solver.Solve(null, null);
 
-            //Console.WriteLine("Complete!");
+            //Transformer transformer = new OneFiveOrderPoly();
+            Transformer transformer = new Bilinear();
+
+            Bitmap logo = new Bitmap("logotest.png");
+            Bitmap flag = new Bitmap(logo.Width, logo.Height);
+
+            foreach (KeyValuePair<Shape, Shape> pair in ShapeList)
+            {
+                transformer.DrawShape(logo, flag, pair.Key, pair.Value);
+            }
+
+            flag.Save("logooutput.png");
+            logo.Dispose();
+            flag.Dispose();
+
+
+            Console.WriteLine("Complete!");
             Console.ReadLine();
         }
 
@@ -164,84 +175,6 @@ namespace CardMaker
                 strlist.Add(string.Format("[{0},{1}]", point.X, point.Y));
             }
             return "[" + string.Join(",", strlist) + "]";
-        }
-
-        private static Boolean CompareImage(string origFilePath, string warpedFilePath)
-        {
-            Bitmap origImage = new Bitmap(origFilePath);
-            Bitmap warpedImage = new Bitmap(warpedFilePath);
- 
-            int w = warpedImage.Width;
-            int h = warpedImage.Height;
-
-            /*
-            for (int x = 0; x < w; x += 1)
-            {
-                for (int y = 0; y < h; y += 1)
-                {
-                    Color pixel = warpedImage.GetPixel(x, y);
-
-                    for (int x2 = 0; x2 < w; x2 += 1)
-                    {
-                        for (int y2 = 0; y2 < h; y2 += 1)
-                        {
-                            if (x != x2 && y != y2)
-                            {
-                                Console.WriteLine(string.Format("x={0} y={1} x2={2} y2={3}", x, y, x2, y2));
-
-                                Color pixel2 = warpedImage.GetPixel(x2, y2);
-                                if (pixel.A != 0 && pixel.Equals(pixel2))
-                                {
-                                    Console.WriteLine("Found duplicate pixel color");
-                                    Console.WriteLine(string.Format("Color 1:{0} Color2:{1}", pixel.ToString(), pixel2.ToString()));
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            */
-            
-            for (int x = 0; x < w; x += 1)
-            {
-                for (int y = 0; y < h; y += 1)
-                {
-                    Color pixel = warpedImage.GetPixel(x, y);
-                    if (pixel.A != 0)
-                    {
-                        int matches = GetColorMatches(origImage, pixel);
-                        if (matches != 1)
-                        {
-                            Console.WriteLine(string.Format("Found {0} matches", matches));
-                            return true;
-                        }
-                    }
-                }
-            }
-            
-            return true;
-        }
-
-        private static int GetColorMatches(Bitmap image, Color pixel)
-        {
-            int w = image.Width;
-            int h = image.Height;
-
-            int matches = 0;
-            for (int x = 0; x < w; x += 1)
-            {
-                for (int y = 0; y < h; y += 1)
-                {
-                    Color pixel2 = image.GetPixel(x, y);
-                    if (pixel.Equals(pixel2))
-                    {
-                        matches += 1;
-                    }
-                }
-            }
-
-            return matches;
         }
 
         private static Bitmap CreateImage(int w, int h, int s)
