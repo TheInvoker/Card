@@ -36,8 +36,8 @@ namespace CardMaker
 
 
             //Transformer transformer = new OneFiveOrderPoly();
-            //Transformer transformer = new Bilinear();
-            Transformer transformer = new Perspective();
+            Transformer transformer = new Bilinear();
+            //Transformer transformer = new Perspective();
 
             Bitmap logo = new Bitmap("logotest.png");
             Bitmap flag = new Bitmap(logo.Width, logo.Height);
