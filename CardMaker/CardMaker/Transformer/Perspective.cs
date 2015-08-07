@@ -9,7 +9,7 @@ namespace CardMaker
 {
     class Perspective : Transformer
     {
-        public override void DrawShape(Bitmap logo, Bitmap flag, Shape original, Shape warped, Dictionary<string, Point> mapping)
+        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<string, Point> mapping)
         {
             double[,] X = new double[8, 8];
             double[] Y = new double[8];
@@ -101,10 +101,9 @@ namespace CardMaker
             List<Pixel> warpedPixels = warped.GetPixels();
             foreach (Pixel pixel in warpedPixels)
             {
-                int originalX = Math.Min(logo.Width - 1, Math.Max(0, Convert.ToInt32((a0 + a1 * pixel.GetX() + a2 * pixel.GetY()) / (1 + c1 * pixel.GetX() + c2 * pixel.GetY()))));
-                int originalY = Math.Min(logo.Height - 1, Math.Max(0, Convert.ToInt32((b0 + b1 * pixel.GetX() + b2 * pixel.GetY()) / (1 + c1 * pixel.GetX() + c2 * pixel.GetY()))));
+                int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32((a0 + a1 * pixel.GetX() + a2 * pixel.GetY()) / (1 + c1 * pixel.GetX() + c2 * pixel.GetY()))));
+                int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32((b0 + b1 * pixel.GetX() + b2 * pixel.GetY()) / (1 + c1 * pixel.GetX() + c2 * pixel.GetY()))));
 
-                flag.SetPixel(pixel.GetX(), pixel.GetY(), logo.GetPixel(originalX, originalY));
                 mapping.Add(string.Format("{0},{1}", pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
             }
         }

@@ -6,7 +6,7 @@ namespace CardMaker
 {
     class Bilinear : Transformer
     {
-        public override void DrawShape(Bitmap logo, Bitmap flag, Shape original, Shape warped, Dictionary<string, Point> mapping)
+        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<string, Point> mapping)
         {
             if (!original.GetTopLeftPixel().GetColor().Equals(Color.FromArgb(40,40,120)))
             {
@@ -90,10 +90,9 @@ namespace CardMaker
                 double B = B_One + (b3 * pixel.GetX() - a3 * pixel.GetY());
                 double C = C_One + (b1 * pixel.GetX() - a1 * pixel.GetY());
 
-                int originalY = Convert.ToInt32(Math.Min(logo.Height - 1, Math.Max(0, (-B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C)) / (2 * A))));
-                int originalX = Convert.ToInt32(Math.Min(logo.Width - 1, Math.Max(0, (pixel.GetX() - a0 - a2 * originalY) / (a1 + a3 * originalY))));
+                int originalY = Convert.ToInt32(Math.Min(h - 1, Math.Max(0, (-B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C)) / (2 * A))));
+                int originalX = Convert.ToInt32(Math.Min(w - 1, Math.Max(0, (pixel.GetX() - a0 - a2 * originalY) / (a1 + a3 * originalY))));
 
-                flag.SetPixel(pixel.GetX(), pixel.GetY(), logo.GetPixel(originalX, originalY));
                 mapping.Add(string.Format("{0},{1}", pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
 
                 Console.WriteLine("{0},{1} -> {2},{3}", pixel.GetX(), pixel.GetY(), originalX, originalY);

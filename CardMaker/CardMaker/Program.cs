@@ -10,26 +10,33 @@ namespace CardMaker
         static void Main(string[] args)
         {
             //GridMaker.CreateGrid(1000, 1000, 100, "test.png");
-            //Exporter.ExportLogo("logo.png", "newlogo.png", mapping);
 
-
-            List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping("test.png", "output.png", "warp2.png", "output.png");
+            Bitmap origImage = new Bitmap("test.png");
+            Bitmap warpedImage = new Bitmap("warp3.png");
+            List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
 
             Transformer transformer = new OneFiveOrderPoly();
             //Transformer transformer = new Bilinear();
             //Transformer transformer = new Perspective();
 
-            Dictionary<string, Point> mapping = GenerateWarpedImage(ShapeList, transformer, "tests/colourcircle.png", "logooutput.png");
+            Dictionary<string, Point> mapping = GenerateWarpedImage(ShapeList, transformer, origImage.Width, origImage.Height);
+
+            origImage.Dispose();
+            warpedImage.Dispose();
             System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
+
+            Exporter.ExportLogo("tests/colourcircle.png", "tests/colourcircleOUT.png", mapping);
+            Exporter.ExportLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", "tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080pOUT.png", mapping);
+            Exporter.ExportLogo("tests/4148404-love-abstract-design.jpg", "tests/4148404-love-abstract-designOUT.png", mapping);
 
             Console.WriteLine("Complete!");
             Console.ReadLine();
         }
 
-        private static List<KeyValuePair<Shape, Shape>> CreateShapeMapping(string origName, string origOut, string warpName, string warpOut)
+        private static List<KeyValuePair<Shape, Shape>> CreateShapeMapping(Bitmap origImage, Bitmap warpedImage, string origOut, string warpOut)
         {
-            List<Shape> OriginalShapes = SquareDetector.FindSquare(origName, origOut);
-            List<Shape> WarpedSquares = SquareDetector.FindSquare(warpName, warpOut);
+            List<Shape> OriginalShapes = SquareDetector.FindSquare(origImage, origOut);
+            List<Shape> WarpedSquares = SquareDetector.FindSquare(warpedImage, warpOut);
 
             List<KeyValuePair<Shape, Shape>> ShapeList = new List<KeyValuePair<Shape, Shape>>();
             foreach (Shape shape in OriginalShapes)
@@ -42,20 +49,14 @@ namespace CardMaker
             return ShapeList;
         }
 
-        private static Dictionary<string, Point> GenerateWarpedImage(List<KeyValuePair<Shape, Shape>> ShapeList, Transformer transformer, string inName, string outName)
+        private static Dictionary<string, Point> GenerateWarpedImage(List<KeyValuePair<Shape, Shape>> ShapeList, Transformer transformer, int w, int h)
         {
-            Bitmap logo = new Bitmap(inName);
-            Bitmap flag = new Bitmap(logo.Width, logo.Height);
             Dictionary<string, Point> mapping = new Dictionary<string, Point>();
 
             foreach (KeyValuePair<Shape, Shape> pair in ShapeList)
             {
-                transformer.DrawShape(logo, flag, pair.Key, pair.Value, mapping);
+                transformer.DrawShape(w, h, pair.Key, pair.Value, mapping);
             }
-
-            flag.Save(outName);
-            logo.Dispose();
-            flag.Dispose();
 
             return mapping;
         }

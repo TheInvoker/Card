@@ -9,9 +9,8 @@ namespace CardMaker
     {
         public static Boolean[] allPixels;
 
-        public static List<Shape> FindSquare(string filePath, string outName)
+        public static List<Shape> FindSquare(Bitmap logoImage, string outName)
         {
-            Bitmap logoImage = new Bitmap(filePath);
             List<Shape> ListSquares = new List<Shape>();
 
             int w = logoImage.Width;
@@ -55,10 +54,11 @@ namespace CardMaker
                 }
             }
 
-            DrawLines(logoImage, ListSquares);
-
-            logoImage.Save(outName);
-            logoImage.Dispose();
+            if (outName != null)
+            {
+                DrawLines(logoImage, ListSquares);
+                logoImage.Save(outName);
+            }
 
             Console.WriteLine(string.Format("Complete! Found {0} squares", ListSquares.Count));
 
