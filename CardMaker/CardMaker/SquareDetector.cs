@@ -8,21 +8,8 @@ namespace CardMaker
     class SquareDetector
     {
         public static Boolean[] allPixels;
-        public static Color[] colors = new Color[]
-        {
-            Color.FromArgb(255,153,0),
-            Color.FromArgb(200,200,0),
-            Color.FromArgb(153,102,255),
-            Color.FromArgb(204,102,102),
-            Color.FromArgb(0,153,153),
-            Color.FromArgb(102,0,102),
-            Color.FromArgb(102,255,153),
-            Color.FromArgb(0,51,51),
-            Color.FromArgb(255,0,102),
-            Color.FromArgb(0,102,255)
-        };
 
-        public static List<Shape> FindSquare(string filePath)
+        public static List<Shape> FindSquare(string filePath, string outName)
         {
             Bitmap logoImage = new Bitmap(filePath);
             List<Shape> ListSquares = new List<Shape>();
@@ -68,9 +55,9 @@ namespace CardMaker
                 }
             }
 
-            //DrawLines(logoImage, ListSquares);
+            DrawLines(logoImage, ListSquares);
 
-            logoImage.Save("output.png");
+            logoImage.Save(outName);
             logoImage.Dispose();
 
             Console.WriteLine(string.Format("Complete! Found {0} squares", ListSquares.Count));
@@ -201,6 +188,7 @@ namespace CardMaker
 
             return squares;
         }
+
         private static List<Pixel> GetNeighBours(Bitmap image, int x, int y)
         {
             int newx, newy;
@@ -228,6 +216,7 @@ namespace CardMaker
             }
             return adj;
         }
+
         private static void ProcessNeighbour(Bitmap image, List<Pixel> adjacentPoints, int newx, int newy, int w, int h, Pixel u)
         {
             int i = GetIndex(w, newx, newy);
@@ -241,19 +230,23 @@ namespace CardMaker
                 }
             }
         }
+
         private static int GetIndex(int w, int x, int y)
         {
             return y * w + x;
         }
+
         private static double GetDistance(Pixel p1, Pixel p2)
         {
             return Math.Sqrt(Math.Pow(p2.GetX()-p1.GetX(),2) + Math.Pow(p2.GetY() - p1.GetY(), 2));
         }
+
         private static Point GetPoint(int w, int i)
         {
             int x = i % w;
             return new Point(x, (i - x) / w);
         }
+
         private static Boolean InSquare(int w, int h, int x, int y)
         {
             return x >= 0 && x < w && y >= 0 && y < h;

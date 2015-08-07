@@ -44,16 +44,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bilinear.cs" />
-    <Compile Include="OneFiveOrderPoly.cs" />
-    <Compile Include="Perspective.cs" />
+    <Compile Include="Exporter.cs" />
+    <Compile Include="FindDark.cs" />
+    <Compile Include="GridMaker.cs" />
+    <Compile Include="Transformer\Bilinear.cs" />
+    <Compile Include="Transformer\OneFiveOrderPoly.cs" />
+    <Compile Include="Transformer\Perspective.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="Solver.cs" />
     <Compile Include="SquareDetector.cs" />
-    <Compile Include="Transformer.cs" />
+    <Compile Include="Transformer\Transformer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
