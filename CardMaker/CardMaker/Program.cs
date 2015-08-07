@@ -19,11 +19,11 @@ namespace CardMaker
             //Transformer transformer = new Bilinear();
             //Transformer transformer = new Perspective();
 
-            Dictionary<string, Point> mapping = GenerateWarpedImage(ShapeList, transformer, origImage.Width, origImage.Height);
+            Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformer, origImage.Width, origImage.Height);
 
             origImage.Dispose();
             warpedImage.Dispose();
-            System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
+            //System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
 
             Exporter.ExportLogo("tests/colourcircle.png", "tests/colourcircleOUT.png", mapping);
             Exporter.ExportLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", "tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080pOUT.png", mapping);
@@ -49,9 +49,9 @@ namespace CardMaker
             return ShapeList;
         }
 
-        private static Dictionary<string, Point> GenerateWarpedImage(List<KeyValuePair<Shape, Shape>> ShapeList, Transformer transformer, int w, int h)
+        private static Dictionary<Point, Point> GenerateWarpedImage(List<KeyValuePair<Shape, Shape>> ShapeList, Transformer transformer, int w, int h)
         {
-            Dictionary<string, Point> mapping = new Dictionary<string, Point>();
+            Dictionary<Point, Point> mapping = new Dictionary<Point, Point>();
 
             foreach (KeyValuePair<Shape, Shape> pair in ShapeList)
             {
@@ -61,9 +61,9 @@ namespace CardMaker
             return mapping;
         }
 
-        private static string MyDictionaryToJson(Dictionary<string, Point> dict)
+        private static string MyDictionaryToJson(Dictionary<Point, Point> dict)
         {
-            var entries = dict.Select(d => string.Format("\"{0}\": [{1},{2}]", d.Key, d.Value.X, d.Value.Y));
+            var entries = dict.Select(d => string.Format("\"{0},{1}\":[{2},{3}]", d.Key.X, d.Key.Y, d.Value.X, d.Value.Y));
             return "{" + string.Join(",", entries) + "}";
         }
     }

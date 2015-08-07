@@ -6,11 +6,11 @@ namespace CardMaker
 {
     class Bilinear : Transformer
     {
-        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<string, Point> mapping)
+        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
         {
             if (!original.GetTopLeftPixel().GetColor().Equals(Color.FromArgb(40,40,120)))
             {
-                return;
+                //return;
             }
 
             double[,] X = new double[4, 4];
@@ -93,10 +93,10 @@ namespace CardMaker
                 int originalY = Convert.ToInt32(Math.Min(h - 1, Math.Max(0, (-B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C)) / (2 * A))));
                 int originalX = Convert.ToInt32(Math.Min(w - 1, Math.Max(0, (pixel.GetX() - a0 - a2 * originalY) / (a1 + a3 * originalY))));
 
-                mapping.Add(string.Format("{0},{1}", pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
+                mapping.Add(new Point(pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
 
                 Console.WriteLine("{0},{1} -> {2},{3}", pixel.GetX(), pixel.GetY(), originalX, originalY);
-                break;
+                //break;
             }
         }
     }

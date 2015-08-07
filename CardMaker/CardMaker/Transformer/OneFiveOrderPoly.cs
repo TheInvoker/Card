@@ -9,7 +9,7 @@ namespace CardMaker
 {
     class OneFiveOrderPoly : Transformer
     {
-        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<string, Point> mapping)
+        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
         {
             double[,] X = new double[4, 4];
             double[] Y = new double[4];
@@ -41,7 +41,7 @@ namespace CardMaker
                 int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(a0 + a1 * pixel.GetX() + a2 * pixel.GetY() + a3 * pixel.GetX() * pixel.GetY())));
                 int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(b0 + b1 * pixel.GetX() + b2 * pixel.GetY() + b3 * pixel.GetX() * pixel.GetY())));
 
-                mapping.Add(string.Format("{0},{1}", pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
+                mapping.Add(new Point(pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
             }
         }
     }
