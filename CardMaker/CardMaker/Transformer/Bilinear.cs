@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using System.Drawing;
 using System;
 
@@ -8,96 +9,75 @@ namespace CardMaker
     {
         public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
         {
-            if (!original.GetTopLeftPixel().GetColor().Equals(Color.FromArgb(40,40,120)))
-            {
-                //return;
-            }
+            double offset = original.GetTopRightPixel().GetX() - original.GetTopLeftPixel().GetX();
+
+            double oTopLeftX = original.GetTopLeftPixel().GetX() / offset;
+            double oTopLeftY = original.GetTopLeftPixel().GetY() / offset;
+            double oTopRightX = original.GetTopRightPixel().GetX() / offset;
+            double oTopRightY = original.GetTopRightPixel().GetY() / offset;
+            double oBottomRightX = original.GetBottomRightPixel().GetX() / offset;
+            double oBottomRightY = original.GetBottomRightPixel().GetY() / offset;
+            double oBottomLeftX = original.GetBottomLeftPixel().GetX() / offset;
+            double oBottomLeftY = original.GetBottomLeftPixel().GetY() / offset;
+            double wTopLeftX = warped.GetTopLeftPixel().GetX() / offset;
+            double wTopLeftY = warped.GetTopLeftPixel().GetY() / offset;
+            double wTopRightX = warped.GetTopRightPixel().GetX() / offset;
+            double wTopRightY = warped.GetTopRightPixel().GetY() / offset;
+            double wBottomRightX = warped.GetBottomRightPixel().GetX() / offset;
+            double wBottomRightY = warped.GetBottomRightPixel().GetY() / offset;
+            double wBottomLeftX = warped.GetBottomLeftPixel().GetX() / offset;
+            double wBottomLeftY = warped.GetBottomLeftPixel().GetY() / offset;
 
             double[,] X = new double[4, 4];
             double[] Y = new double[4];
 
-            X[0, 0] = 1; X[1, 0] = original.GetTopLeftPixel().GetX(); X[2, 0] = original.GetTopLeftPixel().GetY(); X[3, 0] = X[1, 0] * X[2, 0];
-            X[0, 1] = 1; X[1, 1] = original.GetTopRightPixel().GetX(); X[2, 1] = original.GetTopRightPixel().GetY(); X[3, 1] = X[1, 1] * X[2, 1];
-            X[0, 2] = 1; X[1, 2] = original.GetBottomRightPixel().GetX(); X[2, 2] = original.GetBottomRightPixel().GetY(); X[3, 2] = X[1, 2] * X[2, 2];
-            X[0, 3] = 1; X[1, 3] = original.GetBottomLeftPixel().GetX(); X[2, 3] = original.GetBottomLeftPixel().GetY(); X[3, 3] = X[1, 3] * X[2, 3];
+            X[0, 0] = 1; X[1, 0] = oTopLeftX; X[2, 0] = oTopLeftY; X[3, 0] = X[1, 0] * X[2, 0];
+            X[0, 1] = 1; X[1, 1] = oTopRightX; X[2, 1] = oTopRightY; X[3, 1] = X[1, 1] * X[2, 1];
+            X[0, 2] = 1; X[1, 2] = oBottomRightX; X[2, 2] = oBottomRightY; X[3, 2] = X[1, 2] * X[2, 2];
+            X[0, 3] = 1; X[1, 3] = oBottomLeftX; X[2, 3] = oBottomLeftY; X[3, 3] = X[1, 3] * X[2, 3];
 
-            Y[0] = warped.GetTopLeftPixel().GetX();
-            Y[1] = warped.GetTopRightPixel().GetX();
-            Y[2] = warped.GetBottomRightPixel().GetX();
-            Y[3] = warped.GetBottomLeftPixel().GetX();
+            Y[0] = wTopLeftX;
+            Y[1] = wTopRightX;
+            Y[2] = wBottomRightX;
+            Y[3] = wBottomLeftX;
 
-
-            Console.WriteLine("[{0} {1} {2} {3}][a0] [{4}]", X[0, 0], X[1, 0], X[2, 0], X[3, 0], Y[0]);
-            Console.WriteLine("[{0} {1} {2} {3}][a1]=[{4}]", X[0, 1], X[1, 1], X[2, 1], X[3, 1], Y[1]);
-            Console.WriteLine("[{0} {1} {2} {3}][a2] [{4}]", X[0, 2], X[1, 2], X[2, 2], X[3, 2], Y[2]);
-            Console.WriteLine("[{0} {1} {2} {3}][a3] [{4}]", X[0, 3], X[1, 3], X[2, 3], X[3, 3], Y[3]);
             Solver.Solve(X, Y);
-            Console.WriteLine("coefficients: {0} {1} {2} {3}", Y[0], Y[1], Y[2], Y[3]);
-            Console.WriteLine(X[0, 0] * Y[0] + X[1, 0] * Y[1] + X[2, 0] * Y[2] + X[3, 0] * Y[3]);
-            Console.WriteLine(X[0, 1] * Y[0] + X[1, 1] * Y[1] + X[2, 1] * Y[2] + X[3, 1] * Y[3]);
-            Console.WriteLine(X[0, 2] * Y[0] + X[1, 2] * Y[1] + X[2, 2] * Y[2] + X[3, 2] * Y[3]);
-            Console.WriteLine(X[0, 3] * Y[0] + X[1, 3] * Y[1] + X[2, 3] * Y[2] + X[3, 3] * Y[3]);
-
             double a0 = Y[0], a1 = Y[1], a2 = Y[2], a3 = Y[3];
 
-            Y[0] = warped.GetTopLeftPixel().GetY();
-            Y[1] = warped.GetTopRightPixel().GetY();
-            Y[2] = warped.GetBottomRightPixel().GetY();
-            Y[3] = warped.GetBottomLeftPixel().GetY();
+            Y[0] = wTopLeftY;
+            Y[1] = wTopRightY;
+            Y[2] = wBottomRightY;
+            Y[3] = wBottomLeftY;
 
-            Console.WriteLine("[{0} {1} {2} {3}][a0] [{4}]", X[0, 0], X[1, 0], X[2, 0], X[3, 0], Y[0]);
-            Console.WriteLine("[{0} {1} {2} {3}][a1]=[{4}]", X[0, 1], X[1, 1], X[2, 1], X[3, 1], Y[1]);
-            Console.WriteLine("[{0} {1} {2} {3}][a2] [{4}]", X[0, 2], X[1, 2], X[2, 2], X[3, 2], Y[2]);
-            Console.WriteLine("[{0} {1} {2} {3}][a3] [{4}]", X[0, 3], X[1, 3], X[2, 3], X[3, 3], Y[3]);
             Solver.Solve(X, Y);
-            Console.WriteLine("coefficients: {0} {1} {2} {3}", Y[0], Y[1], Y[2], Y[3]);
-            Console.WriteLine(X[0, 0] * Y[0] + X[1, 0] * Y[1] + X[2, 0] * Y[2] + X[3, 0] * Y[3]);
-            Console.WriteLine(X[0, 1] * Y[0] + X[1, 1] * Y[1] + X[2, 1] * Y[2] + X[3, 1] * Y[3]);
-            Console.WriteLine(X[0, 2] * Y[0] + X[1, 2] * Y[1] + X[2, 2] * Y[2] + X[3, 2] * Y[3]);
-            Console.WriteLine(X[0, 3] * Y[0] + X[1, 3] * Y[1] + X[2, 3] * Y[2] + X[3, 3] * Y[3]);
-
             double b0 = Y[0], b1 = Y[1], b2 = Y[2], b3 = Y[3];
+
 
 
             double A = (b2 * a3) - (b3 * a2);
             if (A == 0)
-                A = 0.0000001;
+                A = 0.00000000000001;
             double B_One = (b0 * a3 - b3 * a0) + (b2 * a1 - b1 * a2);
             double C_One = b0 * a1 - b1 * a0;
-
-            Console.WriteLine("{0},{1}    {2},{3}    {4},{5}    {6},{7}", 
-                original.GetTopLeftPixel().GetX(),
-                original.GetTopLeftPixel().GetY(),
-                original.GetTopRightPixel().GetX(),
-                original.GetTopRightPixel().GetY(),
-                original.GetBottomRightPixel().GetX(),
-                original.GetBottomRightPixel().GetY(),
-                original.GetBottomLeftPixel().GetX(),
-                original.GetBottomLeftPixel().GetY());
-            Console.WriteLine("{0},{1}    {2},{3}    {4},{5}    {6},{7}",
-                warped.GetTopLeftPixel().GetX(),
-                warped.GetTopLeftPixel().GetY(),
-                warped.GetTopRightPixel().GetX(),
-                warped.GetTopRightPixel().GetY(),
-                warped.GetBottomRightPixel().GetX(),
-                warped.GetBottomRightPixel().GetY(),
-                warped.GetBottomLeftPixel().GetX(),
-                warped.GetBottomLeftPixel().GetY());
 
             List<Pixel> warpedPixels = warped.GetPixels();
             foreach (Pixel pixel in warpedPixels)
             {
-                double B = B_One + (b3 * pixel.GetX() - a3 * pixel.GetY());
-                double C = C_One + (b1 * pixel.GetX() - a1 * pixel.GetY());
+                double pX = pixel.GetX() / offset;
+                double pY = pixel.GetY() / offset;
 
-                int originalY = Convert.ToInt32(Math.Min(h - 1, Math.Max(0, (-B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C)) / (2 * A))));
-                int originalX = Convert.ToInt32(Math.Min(w - 1, Math.Max(0, (pixel.GetX() - a0 - a2 * originalY) / (a1 + a3 * originalY))));
+                double B = B_One + (b3 * pX - a3 * pY);
+                double C = C_One + (b1 * pX - a1 * pY);
+
+                double originalY_ = (-B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C)) / (2 * A);
+                double originalX_ = (pX - a0 - a2 * originalY_) / (a1 + a3 * originalY_);
+
+                int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(originalX_ * offset)));
+                int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(originalY_ * offset)));
 
                 mapping.Add(new Point(pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
-
-                Console.WriteLine("{0},{1} -> {2},{3}", pixel.GetX(), pixel.GetY(), originalX, originalY);
-                //break;
             }
         }
     }
 }
+
