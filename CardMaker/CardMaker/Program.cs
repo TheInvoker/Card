@@ -16,8 +16,8 @@ namespace CardMaker
             List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
 
             //Transformer transformer = new OneFiveOrderPoly();
-            Transformer transformer = new Bilinear();
-            //Transformer transformer = new Perspective();
+            //Transformer transformer = new Bilinear();
+            Transformer transformer = new Perspective();
 
             Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformer, origImage.Width, origImage.Height);
 
