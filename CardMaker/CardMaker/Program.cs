@@ -25,10 +25,10 @@ namespace CardMaker
             warpedImage.Dispose();
             //System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
 
-            //Exporter.ExportLogo("tests/colourcircle.png", "tests/colourcircleOUT.png", mapping);
-            //Exporter.ExportLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", "tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080pOUT.png", mapping);
-            //Exporter.ExportLogo("tests/4148404-love-abstract-design.jpg", "tests/4148404-love-abstract-designOUT.png", mapping);
-            //Exporter.ExportLogo("tests/1024px-Burger_King_Logo.svg.png", "tests/1024px-Burger_King_Logo.svgOUT.png", mapping);
+            Exporter.ExportLogo("tests/colourcircle.png", "tests/colourcircleOUT.png", mapping);
+            Exporter.ExportLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", "tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080pOUT.png", mapping);
+            Exporter.ExportLogo("tests/4148404-love-abstract-design.jpg", "tests/4148404-love-abstract-designOUT.png", mapping);
+            Exporter.ExportLogo("tests/1024px-Burger_King_Logo.svg.png", "tests/1024px-Burger_King_Logo.svgOUT.png", mapping);
             Exporter.ExportLogo("tests/logotest.png", "tests/logotestOUT.png", mapping);
 
             Console.WriteLine("Complete!");

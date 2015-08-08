@@ -1,0 +1,5 @@
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\bin\Release\CardMaker.exe.config
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\bin\Release\CardMaker.exe
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\bin\Release\CardMaker.pdb
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\obj\Release\CardMaker.exe
+C:\Users\Ryan\Desktop\Apps\Card\CardMaker\CardMaker\obj\Release\CardMaker.pdb
