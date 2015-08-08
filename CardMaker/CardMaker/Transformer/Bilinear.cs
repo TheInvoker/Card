@@ -55,8 +55,6 @@ namespace CardMaker
 
 
             double A = (b2 * a3) - (b3 * a2);
-            if (A == 0)
-                A = 0.00000000000001;
             double B_One = (b0 * a3 - b3 * a0) + (b2 * a1 - b1 * a2);
             double C_One = b0 * a1 - b1 * a0;
 
@@ -69,11 +67,13 @@ namespace CardMaker
                 double B = B_One + (b3 * pX - a3 * pY);
                 double C = C_One + (b1 * pX - a1 * pY);
 
-                double originalY_ = (-B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C)) / (2 * A);
-                double originalX_ = (pX - a0 - a2 * originalY_) / (a1 + a3 * originalY_);
+                double q = -0.5 * (B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C));
+                double originalY_ = C / q;
+                double t = a1 + a3 * originalY_;
+                double originalX_ = (pX - a0 - a2 * originalY_) / (t);
 
-                int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(originalX_ * offset)));
-                int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(originalY_ * offset)));
+                int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(w - 1, originalX_ * offset)))));
+                int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(h - 1, originalY_ * offset)))));
 
                 mapping.Add(new Point(pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
             }
