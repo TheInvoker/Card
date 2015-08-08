@@ -68,8 +68,7 @@ namespace CardMaker
 
                 double q = -0.5 * (B + Math.Sqrt(Math.Pow(B, 2) - 4 * A * C));
                 double originalY_ = C / q;
-                double t = a1 + a3 * originalY_;
-                double originalX_ = (pX - a0 - a2 * originalY_) / (t);
+                double originalX_ = (pX - a0 - a2 * originalY_) / (a1 + a3 * originalY_);
 
                 int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(w, originalX_ * offset + xOff)))));
                 int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(h, originalY_ * offset + yOff)))));
