@@ -13,23 +13,40 @@ namespace CardMaker
 
             Bitmap origImage = new Bitmap("test.png");
             Bitmap warpedImage = new Bitmap("warp3.png");
-            List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
 
             //Transformer transformer = new OneFiveOrderPoly();
             //Transformer transformer = new Bilinear();
             Transformer transformer = new Perspective();
 
+
+            //ColorFilter filter = new Darken();
+            ColorFilter filter = new VividLight();
+
+        
+            List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
             Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformer, origImage.Width, origImage.Height);
 
             origImage.Dispose();
             warpedImage.Dispose();
             //System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
 
-            Exporter.ExportLogo("tests/colourcircle.png", "tests/colourcircleOUT.png", mapping);
-            Exporter.ExportLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", "tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080pOUT.png", mapping);
-            Exporter.ExportLogo("tests/4148404-love-abstract-design.jpg", "tests/4148404-love-abstract-designOUT.png", mapping);
-            Exporter.ExportLogo("tests/1024px-Burger_King_Logo.svg.png", "tests/1024px-Burger_King_Logo.svgOUT.png", mapping);
-            Exporter.ExportLogo("tests/logotest.png", "tests/logotestOUT.png", mapping);
+            Bitmap warpedimage;
+            warpedimage = Exporter.GenerateWarpedLogo("tests/colourcircle.png", mapping);
+            warpedimage.Save("BITCH1.png");
+            warpedimage = Exporter.GenerateWarpedLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", mapping);
+            warpedimage.Save("BITCH2.png");
+            warpedimage = Exporter.GenerateWarpedLogo("tests/4148404-love-abstract-design.jpg", mapping);
+            warpedimage.Save("BITCH3.png");
+            warpedimage = Exporter.GenerateWarpedLogo("tests/1024px-Burger_King_Logo.svg.png", mapping);
+            warpedimage.Save("BITCH4.png");
+            warpedimage = Exporter.GenerateWarpedLogo("tests/logotest.png", mapping);
+            warpedimage.Save("BITCH5.png");
+
+            Exporter.StampLogo("template/businesscard.png", "FINAL.png", 2780, 1588, 500, 500, warpedimage, filter);
+            Exporter.StampLogo("template/black-clip-purse.png", "FINAL2.png", 600, 600, 400, 400, warpedimage, filter);
+
+            
+            warpedimage.Dispose();
 
             Console.WriteLine("Complete!");
             Console.ReadLine();

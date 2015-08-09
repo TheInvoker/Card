@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Filter\ColorFilter.cs" />
+    <Compile Include="Filter\Darken.cs" />
     <Compile Include="Exporter.cs" />
     <Compile Include="FindDark.cs" />
     <Compile Include="GridMaker.cs" />
@@ -57,10 +59,12 @@
     <Compile Include="Solver.cs" />
     <Compile Include="SquareDetector.cs" />
     <Compile Include="Transformer\Transformer.cs" />
+    <Compile Include="Filter\VividLight.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
