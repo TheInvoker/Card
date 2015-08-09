@@ -11,12 +11,12 @@ namespace CardMaker
         {
             //GridMaker.CreateGrid(1000, 1000, 100, "test.png");
 
-            Bitmap origImage = new Bitmap("test.png");
-            Bitmap warpedImage = new Bitmap("warp3.png");
+            Bitmap origImage = new Bitmap("grid/multigrid.png");
+            Bitmap warpedImage = new Bitmap("template/bump1/warp3.png");
 
-            //Transformer transformer = new OneFiveOrderPoly();
+            Transformer transformer = new OneFiveOrderPoly();
             //Transformer transformer = new Bilinear();
-            Transformer transformer = new Perspective();
+            //Transformer transformer = new Perspective();
 
 
             //ColorFilter filter = new Darken();
@@ -24,28 +24,18 @@ namespace CardMaker
 
         
             List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
+
             Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformer, origImage.Width, origImage.Height);
+            //System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
 
             origImage.Dispose();
             warpedImage.Dispose();
-            //System.IO.File.WriteAllText("mapping.txt", MyDictionaryToJson(mapping));
 
-            Bitmap warpedimage;
-            warpedimage = Exporter.GenerateWarpedLogo("tests/colourcircle.png", mapping);
-            warpedimage.Save("BITCH1.png");
-            warpedimage = Exporter.GenerateWarpedLogo("tests/1414677960_colorful_abstract_design__hd_wallpaper_in_1080p.jpg", mapping);
-            warpedimage.Save("BITCH2.png");
-            warpedimage = Exporter.GenerateWarpedLogo("tests/4148404-love-abstract-design.jpg", mapping);
-            warpedimage.Save("BITCH3.png");
-            warpedimage = Exporter.GenerateWarpedLogo("tests/1024px-Burger_King_Logo.svg.png", mapping);
-            warpedimage.Save("BITCH4.png");
-            warpedimage = Exporter.GenerateWarpedLogo("tests/logotest.png", mapping);
-            warpedimage.Save("BITCH5.png");
+            Bitmap warpedimage = Exporter.GenerateWarpedLogo("tests/android.png", mapping);
 
             Exporter.StampLogo("template/businesscard.png", "FINAL.png", 2780, 1588, 500, 500, warpedimage, filter);
             Exporter.StampLogo("template/black-clip-purse.png", "FINAL2.png", 600, 600, 400, 400, warpedimage, filter);
 
-            
             warpedimage.Dispose();
 
             Console.WriteLine("Complete!");
