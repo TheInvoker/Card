@@ -11,9 +11,6 @@ namespace CardMaker
     {
         static void Main(string[] args)
         {
-            //GridMaker.CreateGrid(1000, 1000, 100, "test.png");
-
-
             List<TemplateRef> files = JsonConvert.DeserializeObject<List<TemplateRef>>(File.ReadAllText("master.js"));
 
             //foreach(TemplateRef template in files)

@@ -8,7 +8,6 @@
 		"transformer" : "1.5orderpoly",
 		"filter" : "darken",
 		"extra" : [
-		
 		],
 		"x" : 488,
 		"y" : 289,
@@ -24,7 +23,6 @@
 		"transformer" : "1.5orderpoly",
 		"filter" : "vividlight",
 		"extra" : [
-		
 		],
 		"x" : 600,
 		"y" : 600,
