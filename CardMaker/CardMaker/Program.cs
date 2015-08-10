@@ -67,6 +67,9 @@ namespace CardMaker
             ColorFilter filterobj;
             switch (filter)
             {
+                case "none":
+                    filterobj = new NoFilter();
+                    break;
                 case "darken":
                     filterobj = new Darken();
                     break;

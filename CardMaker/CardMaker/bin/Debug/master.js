@@ -7,6 +7,9 @@
 		"mapping" : "template/card1/mapping.txt",
 		"transformer" : "1.5orderpoly",
 		"filter" : "darken",
+		"extra" : [
+		
+		],
 		"x" : 488,
 		"y" : 289,
 		"w" : 155,
@@ -20,6 +23,9 @@
 		"mapping" : "template/bump1/mapping.txt",
 		"transformer" : "1.5orderpoly",
 		"filter" : "vividlight",
+		"extra" : [
+		
+		],
 		"x" : 600,
 		"y" : 600,
 		"w" : 400,
