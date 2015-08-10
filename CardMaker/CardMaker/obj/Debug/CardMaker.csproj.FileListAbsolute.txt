@@ -10,3 +10,5 @@ C:\Users\ryand\Desktop\Apps\Card\CardMaker\CardMaker\obj\Debug\CardMaker.pdb
 C:\Users\ryand\Desktop\Apps\Card\CardMaker\CardMaker\obj\Debug\CardMaker.csprojResolveAssemblyReference.cache
 C:\Users\ryand\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\CardMaker.exe
 C:\Users\ryand\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\CardMaker.pdb
+C:\Users\ryand\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ryand\Desktop\Apps\Card\CardMaker\CardMaker\bin\Debug\Newtonsoft.Json.xml
