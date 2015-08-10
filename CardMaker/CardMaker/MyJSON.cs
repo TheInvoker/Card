@@ -7,7 +7,7 @@ namespace CardMaker
 {
     class MyJSON
     {
-        public static void SaveMapping(Dictionary<Point, Point> dict, string outPath)
+        public static void SaveMapping(Dictionary<Point, Point> dict, string transformer, string outPath, string metadataPath)
         {
             Dictionary<int, Dictionary<int, Point>> data = new Dictionary<int, Dictionary<int, Point>>();
 
@@ -30,8 +30,13 @@ namespace CardMaker
             }
 
             string json = JsonConvert.SerializeObject(data);
-
             File.WriteAllText(outPath, json);
+
+            Dictionary<string, string> metadata = new Dictionary<string, string>();
+            metadata.Add("transform", transformer);
+
+            json = JsonConvert.SerializeObject(metadata);
+            File.WriteAllText(metadataPath, json);
         }
 
         public static Dictionary<Point, Point> ReadMapping(string mappingPath)

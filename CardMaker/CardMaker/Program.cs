@@ -13,11 +13,10 @@ namespace CardMaker
         {
             List<TemplateRef> files = JsonConvert.DeserializeObject<List<TemplateRef>>(File.ReadAllText("master.js"));
 
-            //foreach(TemplateRef template in files)
-            //{
-            //    BatchGenerateMapping(template.grid, template.warp, template.transformer, template.mapping);
-            //}
-
+            foreach(TemplateRef template in files)
+            {
+                BatchGenerateMapping(template.grid, template.warp, template.transformer, template.mapping, template.metadata);
+            }
 
             String logoPath = "tests/android.png";
 
@@ -30,33 +29,65 @@ namespace CardMaker
             Console.ReadLine();
         }
 
-        private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath)
+        private static Boolean CanSkip(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
-            Bitmap origImage = new Bitmap(gridPath);
-            Bitmap warpedImage = new Bitmap(warpPath);
+            if (File.Exists(mappingPath) && File.Exists(metadataPath))
+            {
+                FileInfo fi1 = new FileInfo(mappingPath);
+                DateTime mappingLastWriteTime = fi1.LastWriteTime;
 
-            Transformer transformerobj;
-            switch(transformer) {
-                case "1.5orderpoly":
-                    transformerobj = new OneFiveOrderPoly();
-                    break;
-                case "bilinear":
-                    transformerobj = new Bilinear();
-                    break;
-                case "perspective":
-                    transformerobj = new Perspective();
-                    break;
-                default:
-                    throw new InvalidDataException("Invalid transformer argument");
+                FileInfo fi2 = new FileInfo(gridPath);
+                DateTime gridLastWriteTime = fi2.LastWriteTime;
+
+                FileInfo fi3 = new FileInfo(warpPath);
+                DateTime warpLastWriteTime = fi3.LastWriteTime;
+
+                Dictionary<string, string> metadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(metadataPath));
+
+                if (gridLastWriteTime >= mappingLastWriteTime || warpLastWriteTime >= mappingLastWriteTime || !transformer.Equals(metadata["transform"]))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
 
-            List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
+            return true;
+        }
 
-            Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformerobj, origImage.Width, origImage.Height);
-            MyJSON.SaveMapping(mapping, mappingPath);
+        private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
+        {
+            if (!CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
+            {
+                Bitmap origImage = new Bitmap(gridPath);
+                Bitmap warpedImage = new Bitmap(warpPath);
 
-            origImage.Dispose();
-            warpedImage.Dispose();
+                Transformer transformerobj;
+                switch (transformer)
+                {
+                    case "1.5orderpoly":
+                        transformerobj = new OneFiveOrderPoly();
+                        break;
+                    case "bilinear":
+                        transformerobj = new Bilinear();
+                        break;
+                    case "perspective":
+                        transformerobj = new Perspective();
+                        break;
+                    default:
+                        throw new InvalidDataException("Invalid transformer argument");
+                }
+
+                List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
+
+                Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformerobj, origImage.Width, origImage.Height);
+                MyJSON.SaveMapping(mapping, transformer, mappingPath, metadataPath);
+
+                origImage.Dispose();
+                warpedImage.Dispose();
+            }
         }
 
         private static void BatchGenerateResult(string logoPath, string templatePath, string mappingPath, string resultPath, string filter, int x, int y, int w, int h)

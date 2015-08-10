@@ -7,6 +7,7 @@
         public string template { get; set; }
         public string result { get; set; }
         public string mapping { get; set; }
+        public string metadata { get; set; }
         public string transformer { get; set; }
         public string filter { get; set; }
         public string[] extra { get; set; }
