@@ -46,7 +46,7 @@ namespace CardMaker
 
                         if (square.Count == 1)
                         {
-                            Console.WriteLine("Found bad square!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            Console.WriteLine("Found bad shape!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                         }
 
                         break;
@@ -60,7 +60,7 @@ namespace CardMaker
                 logoImage.Save(outName);
             }
 
-            Console.WriteLine(string.Format("Complete! Found {0} squares", ListSquares.Count));
+            Console.WriteLine(string.Format("Complete! Found {0} shapes", ListSquares.Count));
 
             return ListSquares;
         }
@@ -168,8 +168,6 @@ namespace CardMaker
                 Q.RemoveAt(0);
                 squares.Add(u);
                 allPixels[GetIndex(w, u.GetX(), u.GetY())] = false;
-                //image.SetPixel(u.GetX(), u.GetY(), colors[squareCount % 10]);
-                //image.SetPixel(u.GetX(), u.GetY(), Color.FromArgb(0,0,0,0));
 
                 List<Pixel> adjacentPoints = new List<Pixel>();
                 ProcessNeighbour(image, adjacentPoints, u.GetX(), u.GetY() - 1, w, h, u);
@@ -224,7 +222,6 @@ namespace CardMaker
             {
                 Pixel neighbourPixel = new Pixel(image.GetPixel(newx, newy), newx, newy);
                 if (u.GetColor().Equals(neighbourPixel.GetColor()))
-                //if (ColorDistance(u, neighbourPixel) < 3)
                 {
                     adjacentPoints.Add(neighbourPixel);
                 }

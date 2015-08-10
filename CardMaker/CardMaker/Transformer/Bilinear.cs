@@ -10,24 +10,25 @@ namespace CardMaker
         {
             double xOff = original.GetTopLeftPixel().GetX();
             double yOff = original.GetTopLeftPixel().GetY();
-            double offset = original.GetTopRightPixel().GetX() - original.GetTopLeftPixel().GetX();
+            double offsetX = original.GetTopRightPixel().GetX() - original.GetTopLeftPixel().GetX();
+            double offsetY = original.GetBottomRightPixel().GetY() - original.GetTopRightPixel().GetY();
 
             double oTopLeftX = 0;
             double oTopLeftY = 0;
-            double oTopRightX = (original.GetTopRightPixel().GetX() - xOff) / offset;
-            double oTopRightY = (original.GetTopRightPixel().GetY() - yOff) / offset;
-            double oBottomRightX = (original.GetBottomRightPixel().GetX() - xOff) / offset;
-            double oBottomRightY = (original.GetBottomRightPixel().GetY() - yOff) / offset;
-            double oBottomLeftX = (original.GetBottomLeftPixel().GetX() - xOff) / offset;
-            double oBottomLeftY = (original.GetBottomLeftPixel().GetY() - yOff) / offset;
-            double wTopLeftX = (warped.GetTopLeftPixel().GetX() - xOff) / offset;
-            double wTopLeftY = (warped.GetTopLeftPixel().GetY() - yOff) / offset;
-            double wTopRightX = (warped.GetTopRightPixel().GetX() - xOff) / offset;
-            double wTopRightY = (warped.GetTopRightPixel().GetY() - yOff) / offset;
-            double wBottomRightX = (warped.GetBottomRightPixel().GetX() - xOff) / offset;
-            double wBottomRightY = (warped.GetBottomRightPixel().GetY() - yOff) / offset;
-            double wBottomLeftX = (warped.GetBottomLeftPixel().GetX() - xOff) / offset;
-            double wBottomLeftY = (warped.GetBottomLeftPixel().GetY() - yOff) / offset;
+            double oTopRightX = (original.GetTopRightPixel().GetX() - xOff) / offsetX;
+            double oTopRightY = (original.GetTopRightPixel().GetY() - yOff) / offsetY;
+            double oBottomRightX = (original.GetBottomRightPixel().GetX() - xOff) / offsetX;
+            double oBottomRightY = (original.GetBottomRightPixel().GetY() - yOff) / offsetY;
+            double oBottomLeftX = (original.GetBottomLeftPixel().GetX() - xOff) / offsetX;
+            double oBottomLeftY = (original.GetBottomLeftPixel().GetY() - yOff) / offsetY;
+            double wTopLeftX = (warped.GetTopLeftPixel().GetX() - xOff) / offsetX;
+            double wTopLeftY = (warped.GetTopLeftPixel().GetY() - yOff) / offsetY;
+            double wTopRightX = (warped.GetTopRightPixel().GetX() - xOff) / offsetX;
+            double wTopRightY = (warped.GetTopRightPixel().GetY() - yOff) / offsetY;
+            double wBottomRightX = (warped.GetBottomRightPixel().GetX() - xOff) / offsetX;
+            double wBottomRightY = (warped.GetBottomRightPixel().GetY() - yOff) / offsetY;
+            double wBottomLeftX = (warped.GetBottomLeftPixel().GetX() - xOff) / offsetX;
+            double wBottomLeftY = (warped.GetBottomLeftPixel().GetY() - yOff) / offsetY;
 
             double[,] X = new double[4, 4];
             double[] Y = new double[4];
@@ -60,8 +61,8 @@ namespace CardMaker
             List<Pixel> warpedPixels = warped.GetPixels();
             foreach (Pixel pixel in warpedPixels)
             {
-                double pX = (pixel.GetX() - xOff) / offset;
-                double pY = (pixel.GetY() - yOff) / offset;
+                double pX = (pixel.GetX() - xOff) / offsetX;
+                double pY = (pixel.GetY() - yOff) / offsetY;
 
                 double B = B_One + (b3 * pX - a3 * pY);
                 double C = C_One + (b1 * pX - a1 * pY);
@@ -70,8 +71,8 @@ namespace CardMaker
                 double originalY_ = C / q;
                 double originalX_ = (pX - a0 - a2 * originalY_) / (a1 + a3 * originalY_);
 
-                int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(w, originalX_ * offset + xOff)))));
-                int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(h, originalY_ * offset + yOff)))));
+                int originalX = Math.Min(w - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(w, originalX_ * offsetX + xOff)))));
+                int originalY = Math.Min(h - 1, Math.Max(0, Convert.ToInt32(Math.Max(0, Math.Min(h, originalY_ * offsetY + yOff)))));
 
                 mapping.Add(new Point(pixel.GetX(), pixel.GetY()), new Point(originalX, originalY));
             }

@@ -6,7 +6,7 @@
 		"result" : "template/card1/result.png",
 		"mapping" : "template/card1/mapping.txt",
 		"metadata" : "template/card1/metadata.txt",
-		"transformer" : "1.5orderpoly",
+		"transformer" : "bilinear",
 		"filter" : "darken",
 		"extra" : [
 		],
@@ -22,7 +22,7 @@
 		"result" : "template/bump1/result.png",
 		"mapping" : "template/bump1/mapping.txt",
 		"metadata" : "template/bump1/metadata.txt",
-		"transformer" : "1.5orderpoly",
+		"transformer" : "bilinear",
 		"filter" : "vividlight",
 		"extra" : [
 		],
