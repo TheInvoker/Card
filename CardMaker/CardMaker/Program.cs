@@ -15,14 +15,20 @@ namespace CardMaker
 
             foreach(TemplateRef template in files)
             {
-                BatchGenerateMapping(template.grid, template.warp, template.transformer, template.mapping, template.metadata);
+                if (template.active)
+                {
+                    BatchGenerateMapping(template.grid, template.warp, template.transformer, template.mapping, template.metadata);
+                }
             }
 
             String logoPath = "tests/android.png";
 
             foreach (TemplateRef template in files)
             {
-                BatchGenerateResult(logoPath, template.template, template.mapping, template.result, template.filter, template.x, template.y, template.w, template.h);
+                if (template.active)
+                {
+                    BatchGenerateResult(logoPath, template.template, template.mapping, template.result, template.filter, template.x, template.y, template.w, template.h);
+                }
             }
 
             Console.WriteLine("Complete!");

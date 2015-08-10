@@ -11,6 +11,7 @@
         public string transformer { get; set; }
         public string filter { get; set; }
         public string[] extra { get; set; }
+        public bool active { get; set; }
         public int x { get; set; }
         public int y { get; set; }
         public int w { get; set; }
