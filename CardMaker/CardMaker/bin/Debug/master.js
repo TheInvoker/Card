@@ -9,7 +9,7 @@
 		"transformer" : "bilinear",
 		"filter" : "darken",
 		"mask" : "",
-		"active" : true,
+		"active" : false,
 		"extra" : [
 		],
 		"x" : 488,
@@ -27,7 +27,7 @@
 		"transformer" : "bilinear",
 		"filter" : "vividlight",
 		"mask" : "",
-		"active" : true,
+		"active" : false,
 		"extra" : [
 		],
 		"x" : 600,
@@ -45,7 +45,7 @@
 		"transformer" : "bilinear",
 		"filter" : "darken",
 		"mask" : "",
-		"active" : true,
+		"active" : false,
 		"extra" : [
 		],
 		"x" : 655,

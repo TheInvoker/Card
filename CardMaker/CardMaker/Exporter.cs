@@ -26,7 +26,7 @@ namespace CardMaker
             return flag;
         }
 
-        public static void StampLogo(string templatePath, string outPath, int xStart, int yStart, int width, int height, Bitmap logo, ColorFilter filter)
+        public static void StampLogo(string templatePath, string outPath, string maskPath, int xStart, int yStart, int width, int height, Bitmap logo, ColorFilter filter)
         {
             Bitmap templateImage = new Bitmap(templatePath);
             int w = logo.Width;

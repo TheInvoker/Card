@@ -27,7 +27,7 @@ namespace CardMaker
             {
                 if (template.active)
                 {
-                    BatchGenerateResult(logoPath, template.template, template.mapping, template.result, template.filter, template.x, template.y, template.w, template.h);
+                    BatchGenerateResult(logoPath, template.template, template.mapping, template.result, template.filter, template.mask, template.x, template.y, template.w, template.h);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace CardMaker
             }
         }
 
-        private static void BatchGenerateResult(string logoPath, string templatePath, string mappingPath, string resultPath, string filter, int x, int y, int w, int h)
+        private static void BatchGenerateResult(string logoPath, string templatePath, string mappingPath, string resultPath, string filter, string maskPath, int x, int y, int w, int h)
         {
             ColorFilter filterobj;
             switch (filter)
@@ -117,7 +117,7 @@ namespace CardMaker
             Dictionary<Point, Point> mapping = MyJSON.ReadMapping(mappingPath);
 
             Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, mapping);
-            Exporter.StampLogo(templatePath, resultPath, x, y, w, h, warpedimage, filterobj);
+            Exporter.StampLogo(templatePath, resultPath, maskPath, x, y, w, h, warpedimage, filterobj);
 
             warpedimage.Dispose();
         }

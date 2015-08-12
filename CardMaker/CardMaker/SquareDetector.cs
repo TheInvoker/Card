@@ -105,6 +105,13 @@ namespace CardMaker
             int minDistance = 6;
             IEnumerable<KeyValuePair<Pixel, double>> query = keys.OrderBy(x => x.Value);
             
+            if (query.Count() == 1)
+            {
+                Console.WriteLine("Found isolated pixel at {0},{1}", query.ElementAt(0).Key.GetX(), query.ElementAt(0).Key.GetY());
+                Console.ReadLine();
+                Environment.Exit(1);
+            }
+
             corners[0] = query.ElementAt(0).Key;
 
             p = query.ElementAt(i).Key;
