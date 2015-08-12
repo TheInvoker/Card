@@ -8,6 +8,7 @@
 		"metadata" : "template/card1/metadata.txt",
 		"transformer" : "bilinear",
 		"filter" : "darken",
+		"mask" : "",
 		"active" : true,
 		"extra" : [
 		],
@@ -25,6 +26,7 @@
 		"metadata" : "template/bump1/metadata.txt",
 		"transformer" : "bilinear",
 		"filter" : "vividlight",
+		"mask" : "",
 		"active" : true,
 		"extra" : [
 		],
