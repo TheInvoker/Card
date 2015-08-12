@@ -52,5 +52,23 @@
 		"y" : 230,
 		"w" : 1000,
 		"h" : 1000
+	},
+	{
+		"grid" : "grid/multigrid.png",
+		"warp" : "template/coffeecup1/warp.png",
+		"template" : "template/coffeecup1/coffee_cup.png",
+		"result" : "template/coffeecup1/result.png",
+		"mapping" : "template/coffeecup1/mapping.txt",
+		"metadata" : "template/coffeecup1/metadata.txt",
+		"transformer" : "bilinear",
+		"filter" : "darken",
+		"mask" : "",
+		"active" : true,
+		"extra" : [
+		],
+		"x" : 605,
+		"y" : 391,
+		"w" : 1000,
+		"h" : 1000
 	}
 ]
