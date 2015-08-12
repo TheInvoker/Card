@@ -34,5 +34,23 @@
 		"y" : 600,
 		"w" : 400,
 		"h" : 400
+	},
+	{
+		"grid" : "grid/plaingrid.png",
+		"warp" : "template/coaster1/warp.png",
+		"template" : "template/coaster1/coaster1.png",
+		"result" : "template/coaster1/result.png",
+		"mapping" : "template/coaster1/mapping.txt",
+		"metadata" : "template/coaster1/metadata.txt",
+		"transformer" : "bilinear",
+		"filter" : "darken",
+		"mask" : "",
+		"active" : true,
+		"extra" : [
+		],
+		"x" : 655,
+		"y" : 230,
+		"w" : 1000,
+		"h" : 1000
 	}
 ]
