@@ -125,6 +125,8 @@ namespace CardMaker
             Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, maskPath, mapping);
             Exporter.StampLogo(templatePath, resultPath, x, y, w, h, warpedimage, filterobj);
 
+            warpedimage.Save("warpedlogo.png");
+
             warpedimage.Dispose();
         }
 
