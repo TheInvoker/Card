@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace CardMaker
 {
@@ -29,6 +30,23 @@ namespace CardMaker
         public static int ColorBurn(int A, int B)
         {
             return ((B == 0) ? B : Math.Max(0, (255 - ((255 - A) << 8) / B)));
+        }
+
+        public static Color Mix(Color B, Color A)
+        {
+            int rA = A.R;
+            int gA = A.G;
+            int bA = A.B;
+            int aA = A.A;
+            int rB = B.R;
+            int gB = B.G;
+            int bB = B.B;
+            int aB = B.A;
+            int rOut = (rA * aA / 255) + (rB * aB * (255 - aA) / (255 * 255));
+            int gOut = (gA * aA / 255) + (gB * aB * (255 - aA) / (255 * 255));
+            int bOut = (bA * aA / 255) + (bB * aB * (255 - aA) / (255 * 255));
+            int aOut = aA + (aB * (255 - aA) / 255);
+            return Color.FromArgb(aOut, rOut, gOut, bOut);
         }
     }
 }

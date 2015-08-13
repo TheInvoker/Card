@@ -21,7 +21,13 @@ namespace CardMaker
                 }
             }
 
-            String logoPath = "tests/android.png";
+            Console.WriteLine("Enter path to image:");
+            String logoPath = Console.ReadLine();
+            while (!File.Exists(logoPath))
+            {
+                Console.WriteLine("Invalid path!");
+                logoPath = Console.ReadLine();
+            }
 
             foreach (TemplateRef template in files)
             {
@@ -116,8 +122,8 @@ namespace CardMaker
 
             Dictionary<Point, Point> mapping = MyJSON.ReadMapping(mappingPath);
 
-            Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, mapping);
-            Exporter.StampLogo(templatePath, resultPath, maskPath, x, y, w, h, warpedimage, filterobj);
+            Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, maskPath, mapping);
+            Exporter.StampLogo(templatePath, resultPath, x, y, w, h, warpedimage, filterobj);
 
             warpedimage.Dispose();
         }

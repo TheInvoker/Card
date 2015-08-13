@@ -44,8 +44,8 @@
 		"metadata" : "template/coaster1/metadata.txt",
 		"transformer" : "bilinear",
 		"filter" : "darken",
-		"mask" : "",
-		"active" : false,
+		"mask" : "template/coaster1/mask.png",
+		"active" : true,
 		"extra" : [
 		],
 		"x" : 655,
@@ -60,10 +60,10 @@
 		"result" : "template/coffeecup1/result.png",
 		"mapping" : "template/coffeecup1/mapping.txt",
 		"metadata" : "template/coffeecup1/metadata.txt",
-		"transformer" : "bilinear",
+		"transformer" : "1.5orderpoly",
 		"filter" : "darken",
 		"mask" : "",
-		"active" : true,
+		"active" : false,
 		"extra" : [
 		],
 		"x" : 605,

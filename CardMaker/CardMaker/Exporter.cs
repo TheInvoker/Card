@@ -5,28 +5,52 @@ namespace CardMaker
 {
     class Exporter
     {
-        public static Bitmap GenerateWarpedLogo(string logoFilePath, Dictionary<Point, Point> mapping)
+        public static Bitmap GenerateWarpedLogo(string logoFilePath, string maskPath, Dictionary<Point, Point> mapping)
         {
             Bitmap logoImage = new Bitmap(logoFilePath);
             int w = logoImage.Width;
             int h = logoImage.Height;
             Bitmap flag = new Bitmap(w, h);
 
+            Bitmap maskfile = null;
+            if (System.IO.File.Exists(maskPath))
+            {
+                maskfile = new Bitmap(maskPath);
+            }
+
             foreach (KeyValuePair<Point, Point> entry in mapping)
             {
                 int x = entry.Key.X;
                 int y = entry.Key.Y;
                 Point point = entry.Value;
-
                 Color pixel = logoImage.GetPixel(point.X, point.Y);
-                flag.SetPixel(x, y, pixel);
+
+                int newA = pixel.A;
+                if (maskfile != null)
+                {
+                    int maskA = maskfile.GetPixel(x, y).A;
+                    if (maskA != 0)
+                    {
+                        newA *= maskfile.GetPixel(x, y).A / 255;
+                    } else
+                    {
+                        continue;
+                    }
+                }
+
+                flag.SetPixel(x, y, Color.FromArgb(newA, pixel.R, pixel.G, pixel.B));
+            }
+
+            if (maskfile != null)
+            {
+                maskfile.Dispose();
             }
 
             logoImage.Dispose();
             return flag;
         }
 
-        public static void StampLogo(string templatePath, string outPath, string maskPath, int xStart, int yStart, int width, int height, Bitmap logo, ColorFilter filter)
+        public static void StampLogo(string templatePath, string outPath, int xStart, int yStart, int width, int height, Bitmap logo, ColorFilter filter)
         {
             Bitmap templateImage = new Bitmap(templatePath);
             int w = logo.Width;
@@ -51,7 +75,8 @@ namespace CardMaker
                         if (pixel.A != 0)
                         {
                             Color currentPixel = templateImage.GetPixel(x + xStart, y + yStart);
-                            templateImage.SetPixel(x + xStart, y + yStart, filter.GetFilteredColor(currentPixel, pixel));
+                            Color newColor = ColorCalculate.Mix(currentPixel, pixel);
+                            templateImage.SetPixel(x + xStart, y + yStart, filter.GetFilteredColor(currentPixel, newColor));
                         }
                     }
                 }
