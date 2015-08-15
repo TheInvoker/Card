@@ -1,0 +1,115 @@
+body {
+
+}
+
+/*buttons*/
+.btn-primary {
+	background:#00b19a;
+	border:1px solid #00b19a;
+}
+
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+	background:#414141;
+	border:1px solid #414141;
+}
+
+/*header*/
+
+header#top {
+	/*background:rgba(0,0,0,0.02);*/
+	padding:10px 0;
+	border-bottom:1px solid rgba(0,0,0,0.05);
+}
+
+
+/*navbar*/
+ul.nav.navbar-nav.navbar-right a {
+	font-weight:600;
+	color:#414141;
+}
+
+.navbar-brand {
+	font-family: 'Lobster Two', cursive;
+	font-size:2em;
+	color:#00b19a;
+}
+
+.navbar-right {
+	padding-right:15px;
+}
+
+/*jumbotron */
+
+.jumbotron {
+	background:#fff;
+	padding:0;
+}
+
+.jumbotron .container {
+	background:url('../images/hero-banner.png') no-repeat right bottom;
+	border-bottom:1px solid rgba(0,0,0,0.05);
+	padding-top: 48px;
+	padding-bottom:48px;
+}
+
+.jumbotron h2, .jumbotron p {
+	color:#414141;
+}
+
+.jumbotron h2 {
+
+}
+
+.jumbotron p {
+	font-size:18px;
+	color:rgba(0,0,0,0.5);
+}
+
+.jumbotron p span {
+	color:rgba(0,0,0,0.25);
+	padding:0 2px;
+}
+
+/*Gallery*/
+
+.filter {
+	margin: 0 auto;
+	padding:10px 0;
+}
+
+.filter .filter-by {
+	font-size:1.1em;
+	font-weight:600;
+	padding-top:20px;
+	color:#414141;
+}
+
+.filter .thumbnail {
+	text-align:center;
+	border:0px none transparent;
+}
+
+.filter .thumbnail img {
+	max-height:44px;
+	margin-bottom:10px;
+}
+
+.filter .thumbnail span {
+	color: #00b19a;
+
+}
+
+.thumbnail h2 {
+	font-size:26px;
+}
+
+nav.page-nav {
+	text-align:center;
+}
+
+/* detailed page */
+
+.detail-preview img {
+	max-width:100%;
+}
