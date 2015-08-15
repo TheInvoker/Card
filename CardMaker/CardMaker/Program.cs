@@ -95,7 +95,7 @@ namespace CardMaker
                 List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
 
                 Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformerobj, origImage.Width, origImage.Height);
-                MyJSON.SaveMapping(mapping, transformer, mappingPath, metadataPath);
+                MyJSON.SaveMapping(origImage.Width, origImage.Height, mapping, transformer, mappingPath, metadataPath);
 
                 origImage.Dispose();
                 warpedImage.Dispose();

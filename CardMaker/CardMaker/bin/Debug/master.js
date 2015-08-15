@@ -9,7 +9,7 @@
 		"transformer" : "bilinear",
 		"filter" : "darken",
 		"mask" : "",
-		"active" : false,
+		"active" : true,
 		"extra" : [
 		],
 		"x" : 488,
@@ -27,7 +27,7 @@
 		"transformer" : "bilinear",
 		"filter" : "vividlight",
 		"mask" : "",
-		"active" : false,
+		"active" : true,
 		"extra" : [
 		],
 		"x" : 600,
@@ -45,7 +45,7 @@
 		"transformer" : "bilinear",
 		"filter" : "darken",
 		"mask" : "template/coaster1/mask.png",
-		"active" : false,
+		"active" : true,
 		"extra" : [
 		],
 		"x" : 655,

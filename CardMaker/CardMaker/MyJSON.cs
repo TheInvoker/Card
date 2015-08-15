@@ -2,54 +2,101 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CardMaker
 {
     class MyJSON
     {
-        public static void SaveMapping(Dictionary<Point, Point> dict, string transformer, string outPath, string metadataPath)
+        public static void SaveMapping(int width, int height, Dictionary<Point, Point> dict, string transformer, string outPath, string metadataPath)
         {
-            Dictionary<int, Dictionary<int, Point>> data = new Dictionary<int, Dictionary<int, Point>>();
+            StringBuilder builder = new StringBuilder();
 
-            foreach (KeyValuePair<Point, Point> entry in dict)
+            builder.Append(string.Format("{0},{1}", width, height));
+            for (int y = 0; y < height; y += 1)
             {
-                int x = entry.Key.X;
-                int y = entry.Key.Y;
-
-                if (data.ContainsKey(x))
+                for (int x = 0; x < width; x += 1)
                 {
-                     if (!data[x].ContainsKey(y))
+                    Point newPoint = new Point(x, y);
+                    if (dict.ContainsKey(newPoint))
                     {
-                        data[x].Add(y, entry.Value);
+                        Point mappedPoint = dict[newPoint];
+                        builder.Append(string.Format(",{0},{1}", mappedPoint.X, mappedPoint.Y));
+                    } else
+                    {
+                        builder.Append(",,");
                     }
-                } else
-                {
-                    data.Add(x, new Dictionary<int, Point>());
-                    data[x].Add(y, entry.Value);
                 }
             }
+            string finalstring = builder.ToString();
+            
+            Regex rx = new Regex("(,,+)($|,\\d)");
+            finalstring = rx.Replace(finalstring, new MatchEvaluator(delegate (Match m)
+            {
+                string commas = m.Groups[1].ToString();
+                string next = m.Groups[2].ToString();
+                return string.Format("x{0}{1}", commas.Length, next);
+            }));
 
-            string json = JsonConvert.SerializeObject(data);
-            File.WriteAllText(outPath, json);
+            File.WriteAllText(outPath, finalstring);
 
             Dictionary<string, string> metadata = new Dictionary<string, string>();
             metadata.Add("transform", transformer);
 
-            json = JsonConvert.SerializeObject(metadata);
+            string json = JsonConvert.SerializeObject(metadata);
             File.WriteAllText(metadataPath, json);
         }
 
         public static Dictionary<Point, Point> ReadMapping(string mappingPath)
         {
-            Dictionary<int, Dictionary<int, Point>> files = JsonConvert.DeserializeObject<Dictionary<int, Dictionary<int, Point>>>(File.ReadAllText(mappingPath));
+            string finalstring = File.ReadAllText(mappingPath);
 
+            Regex rx = new Regex("(x?\\d+)");
+            MatchCollection mc = rx.Matches(finalstring);
             Dictionary<Point, Point> data = new Dictionary<Point, Point>();
+            Point newPoint = new Point(0,0);
 
-            foreach (KeyValuePair<int, Dictionary<int, Point>> entry in files)
+            int state = 0;
+            int width = 0;
+            int x = 0, y = 0;
+            foreach (Match m in mc)
             {
-                foreach (KeyValuePair<int, Point> entry2 in entry.Value)
+                string val = m.ToString();
+
+                if (state == 0)
                 {
-                    data.Add(new Point(entry.Key, entry2.Key), entry2.Value);
+                    width = System.Convert.ToInt32(val);
+                    state += 1;
+                } else if (state == 1)
+                {
+                    state += 1;
+                } else if (val.Contains("x")) {
+                    int commalength = System.Convert.ToInt32(val.Substring(1))/2;
+                    int curentIndex = width * y + x;
+                    int newIndex = curentIndex + commalength;
+                    y = newIndex / width;
+                    x = newIndex - (width * y);
+                } else
+                {
+                    if (state == 2)
+                    {
+                        newPoint.X = System.Convert.ToInt32(val);
+                        state += 1;
+                    } else
+                    {
+                        newPoint.Y = System.Convert.ToInt32(val);
+                        data.Add(new Point(x, y), newPoint);
+                        newPoint = new Point(0, 0);
+                        state = 2;
+                    
+                        x += 1;
+                        if (x >= width)
+                        {
+                            x = 0;
+                            y += 1;
+                        }
+                    }
                 }
             }
 
