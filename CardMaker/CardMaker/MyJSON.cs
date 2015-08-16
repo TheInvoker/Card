@@ -41,10 +41,7 @@ namespace CardMaker
 
             File.WriteAllText(outPath, finalstring);
 
-            Dictionary<string, string> metadata = new Dictionary<string, string>();
-            metadata.Add("transform", transformer);
-
-            string json = JsonConvert.SerializeObject(metadata);
+            string json = "{\"transform\":\"" + transformer + "\", \"width\":" + width.ToString() + ", \"height\":" + height.ToString() + "}";
             File.WriteAllText(metadataPath, json);
         }
 

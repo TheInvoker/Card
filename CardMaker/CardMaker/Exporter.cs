@@ -5,11 +5,25 @@ namespace CardMaker
 {
     class Exporter
     {
-        public static Bitmap GenerateWarpedLogo(string logoFilePath, string maskPath, Dictionary<Point, Point> mapping)
+        public static Bitmap GenerateWarpedLogo(string logoFilePath, string maskPath, Dictionary<Point, Point> mapping, int width, int height)
         {
-            Bitmap logoImage = new Bitmap(logoFilePath);
-            int w = logoImage.Width;
-            int h = logoImage.Height;
+            Bitmap _logoImage = new Bitmap(logoFilePath);
+            int w = _logoImage.Width;
+            int h = _logoImage.Height;
+
+            Bitmap logoImage = _logoImage;
+            if (w != width || h != height)
+            {
+                logoImage = ResizeImage(_logoImage, width, height);
+                _logoImage.Dispose();
+                w = logoImage.Width;
+                h = logoImage.Height;
+            }
+
+
+
+
+
             Bitmap flag = new Bitmap(w, h);
 
             Bitmap maskfile = null;
@@ -25,13 +39,19 @@ namespace CardMaker
                 Point point = entry.Value;
                 Color pixel = logoImage.GetPixel(point.X, point.Y);
 
+                if (x==360 && y==120)
+                {
+                    int a = 0;
+                    int b = a + 1;
+                }
+
                 int newA = pixel.A;
                 if (maskfile != null)
                 {
                     int maskA = maskfile.GetPixel(x, y).A;
                     if (maskA != 0)
                     {
-                        newA *= maskfile.GetPixel(x, y).A / 255;
+                        newA *= maskA / 255;
                     } else
                     {
                         continue;

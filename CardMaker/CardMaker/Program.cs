@@ -29,13 +29,17 @@ namespace CardMaker
                 logoPath = Console.ReadLine();
             }
 
+            
+            /*
             foreach (TemplateRef template in files)
             {
                 if (template.active)
                 {
-                    BatchGenerateResult(logoPath, template.template, template.mapping, template.result, template.filter, template.mask, template.x, template.y, template.w, template.h);
+                    BatchGenerateResult(logoPath, template.template, template.mapping, template.metadata, template.result, template.filter, template.mask, template.x, template.y, template.w, template.h);
                 }
             }
+            */
+            
 
             Console.WriteLine("Complete!");
             Console.ReadLine();
@@ -54,9 +58,9 @@ namespace CardMaker
                 FileInfo fi3 = new FileInfo(warpPath);
                 DateTime warpLastWriteTime = fi3.LastWriteTime;
 
-                Dictionary<string, string> metadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(metadataPath));
+                MetaDataRef metadata = JsonConvert.DeserializeObject<MetaDataRef>(File.ReadAllText(metadataPath));
 
-                if (gridLastWriteTime >= mappingLastWriteTime || warpLastWriteTime >= mappingLastWriteTime || !transformer.Equals(metadata["transform"]))
+                if (gridLastWriteTime >= mappingLastWriteTime || warpLastWriteTime >= mappingLastWriteTime || !transformer.Equals(metadata.transform))
                 {
                     return false;
                 }
@@ -102,7 +106,7 @@ namespace CardMaker
             }
         }
 
-        private static void BatchGenerateResult(string logoPath, string templatePath, string mappingPath, string resultPath, string filter, string maskPath, int x, int y, int w, int h)
+        private static void BatchGenerateResult(string logoPath, string templatePath, string mappingPath, string metadataPath, string resultPath, string filter, string maskPath, int x, int y, int w, int h)
         {
             ColorFilter filterobj;
             switch (filter)
@@ -120,9 +124,11 @@ namespace CardMaker
                     throw new InvalidDataException("Invalid filter argument");
             }
 
+            MetaDataRef metadata = JsonConvert.DeserializeObject<MetaDataRef>(File.ReadAllText(metadataPath));
+
             Dictionary<Point, Point> mapping = MyJSON.ReadMapping(mappingPath);
 
-            Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, maskPath, mapping);
+            Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, maskPath, mapping, metadata.width, metadata.height);
             Exporter.StampLogo(templatePath, resultPath, x, y, w, h, warpedimage, filterobj);
 
             warpedimage.Save("warpedlogo.png");

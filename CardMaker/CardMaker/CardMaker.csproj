@@ -58,6 +58,7 @@
     <Compile Include="Filter\NoFilter.cs" />
     <Compile Include="FindDark.cs" />
     <Compile Include="GridMaker.cs" />
+    <Compile Include="MetaDataRef.cs" />
     <Compile Include="MyJSON.cs" />
     <Compile Include="TemplateRef.cs" />
     <Compile Include="Transformer\Bilinear.cs" />
