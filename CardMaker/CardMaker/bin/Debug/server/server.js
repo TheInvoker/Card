@@ -2,8 +2,13 @@ var http = require('http')
  , fs = require('fs')
  , request = require('request')
  , qs = require('querystring');
-
-
+ 
+var multiparty = require('multiparty');
+ 
+ 
+ 
+ 
+ 
 var masterArray = [];
 setInterval(function() {
 	fs.readFile('./../master.js', function (err, data) {
@@ -22,6 +27,7 @@ setInterval(function() {
 	});
 }, 1000);
 
+ 
  
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -98,7 +104,7 @@ function getImage(src) {
 		}
 	}
 }
-
+var uploadDirectory = 'images/';
 // http://localhost:41302/template/card1/business-card.jpg
 var PORT = 41302;
 http.createServer(function (req, res) {
@@ -123,7 +129,49 @@ http.createServer(function (req, res) {
 				res.end(img, 'binary');
 			}
 		} else if (paramsArray[0] == "process") {
+			console.log("hi");
+
 			
+            var form = new multiparty.Form();
+            form.parse(req);
+			
+            form.on('file', function(name, file) {
+                var saveFilePath = uploadDirectory + file.originalFilename;
+                console.log(file.path);
+				console.log(saveFilePath);
+				fs.rename(file.path, saveFilePath, function(err) {
+                    if (err) {
+                        // Handle problems with file saving
+						console.log("error");
+						console.log(JSON.stringify(err));
+                        WriteHeaderMode('text/html', res, 200);
+						res.end();
+                    } else {
+                        // Respond to the successful upload with JSON.
+                        // Use a location key to specify the path to the saved image resource.
+                        // { location : '/your/uploaded/image/file'}
+                        var textboxResponse = JSON.stringify({
+                            location: saveFilePath
+                        });
+	
+						console.log(textboxResponse);
+                        // If your script needs to receive cookies, set images.upload.credentials:true in
+                        // the Textbox.io configuration and enable the following two headers.
+                        // res.setHeader('Access-Control-Allow-Credentials', 'true');
+                        // res.setHeader('P3P', 'CP="There is no P3P policy."');
+                        WriteHeaderMode('text/html', res, 200);
+						res.end();
+                    }
+                });
+            });
+            form.on('error', function(err) {
+				console.log(JSON.stringify(err));
+				WriteHeaderMode('text/html', res, 200);
+				res.end();
+            });
+
+			
+
 		} else {
 			WriteHeaderMode('text/html', res, 200);
 			res.end();
