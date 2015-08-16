@@ -128,8 +128,7 @@ nav.page-nav {
 }
 
 .detail-preview .details {
-	max-width:35%;
-}
+    position: static}
 
 .all-previews .preview {
 	margin-top:30px;
