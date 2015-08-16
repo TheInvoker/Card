@@ -2,6 +2,10 @@ body {
 
 }
 
+p.italic {
+	font-style:italic;
+}
+
 /*buttons*/
 .btn-primary {
 	background:#00b19a;
@@ -110,6 +114,84 @@ nav.page-nav {
 
 /* detailed page */
 
-.detail-preview img {
+.detail-title .breadcrumbs {
+	width:100%;
+	padding:15px;
+}
+
+.detail-preview .preview, .all-previews .preview {
+	max-width:65%;
+}
+
+.detail-preview .preview img, .all-previews .preview img {
 	max-width:100%;
+}
+
+.detail-preview .details {
+	max-width:35%;
+}
+
+.all-previews .preview {
+	margin-top:30px;
+}
+
+.all-previews .preview:first-child {
+	margin-top:26px;
+}
+
+/* upload */
+
+#upload {
+    background-color: rgba(0,0,0,0.04);
+    width: 100%;
+    padding: 30px;
+    border-radius: 3px;
+}
+
+#drop {
+    background-color:#fff;
+    padding: 40px 50px;
+    margin-bottom: 30px;
+    border: 2px dashed rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: bold;
+    color: #414141;
+ }
+
+ #drop input {
+ 	display:none;
+ }
+
+ #drop a {
+    background-color: #00b19a;
+    padding: 12px 26px;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 12px;
+    line-height: 1;
+}
+
+ #upload ul {
+    list-style: none;
+    margin: 0 -30px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid #fff;
+}
+
+#upload ul li {
+    background-color: #333639;
+    background-image: -webkit-linear-gradient(top, #333639, #303335);
+    background-image: -moz-linear-gradient(top, #333639, #303335);
+    background-image: linear-gradient(top, #333639, #303335);
+    border-top: 1px solid #3d4043;
+    border-bottom: 1px solid #2b2e31;
+    padding: 15px;
+    height: 52px;
+    position: relative;
 }

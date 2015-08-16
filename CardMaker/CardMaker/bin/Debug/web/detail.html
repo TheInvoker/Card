@@ -15,8 +15,6 @@
     <!-- Custom styles for this template -->
     <link href="css/main.css" rel="stylesheet">
     
-    <script src="js/holder.js"></script>
-
     <link href='http://fonts.googleapis.com/css?family=Lobster+Two' rel='stylesheet' type='text/css'>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -48,15 +46,56 @@
         </div>
       </header>
 
-      <div class="row container detail-title"><h2>Template title</h2></div>
+
+
+    <div class="container">
+      
+      <div class="row detail-title">
+          <div class="col-md-12 breadcrumbs">
+            <p>Category / Template Name</p>
+          </div>
+      </div>
+
 
       <div class="row detail-preview">
-        <div class="container">
-            <div class="col-md-8">
+            <div class="col-md-8 preview">
               <img src="images/detailed-page-demo/block_paper_angle5.jpg"></img>
             </div>
             
-            <div class="col-md-4"></div>
+            <div class="col-md-4 details">
+              <h2>Template Title</h2>
+              <hr>
+              <p>Description goes here ipsum lorem some dummy text taking some space you should totally download</p>
+              <hr>
+
+              <form id="upload" method="post" action="upload.php" enctype="multipart/form-data">
+                  <div id="drop">
+                    Drop Here
+
+                    <a>Browse</a>
+                    <input type="file" name="upl" multiple />
+                  </div>
+
+                  <ul>
+                    <!-- The file uploads will be shown here -->
+                  </ul>
+
+                </form>
+
+                <p class="italic">Want to see how your designs look on this template? Drag and drop your design into the box above!</p>
+
+            </div>
+      </div>
+
+      <div class="row all-previews">
+        <div class="col-md-8 preview">
+          <img src="images/detailed-page-demo/block_paper_angle5.jpg"></img>
+        </div>
+         <div class="col-md-8 preview">
+          <img src="images/detailed-page-demo/block_paper_angle5.jpg"></img>
+        </div>
+         <div class="col-md-8 preview">
+          <img src="images/detailed-page-demo/block_paper_angle5.jpg"></img>
         </div>
 
       </div>
@@ -69,7 +108,6 @@
       </footer>
     </div> <!-- /container -->
 
-
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -77,6 +115,19 @@
     <script src="../../dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    
+    <!-- JavaScript Includes -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="js/jquery.knob.js"></script>
+
+    <!-- jQuery File Upload Dependencies -->
+    <script src="js/jquery.ui.widget.js"></script>
+    <script src="js/jquery.iframe-transport.js"></script>
+    <script src="js/jquery.fileupload.js"></script>
+
+    <!-- Our main JS file -->
+    <script src="js/upload.js"></script>
+
   
 
 <span id="buffer-extension-hover-button" style="display: none;position: absolute;z-index: 8675309;width: 100px;height: 25px;background-image: url(chrome-extension://noojglkidnpfjbincgijbaiedldjfbhh/data/shared/img/buffer-hover-icon@1x.png);background-size: 100px 25px;opacity: 0.9;cursor: pointer;"></span></body></html>
