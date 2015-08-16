@@ -1,50 +1,34 @@
 var http = require('http')
  , fs = require('fs')
  , request = require('request')
- , qs = require('querystring');
- 
-var multiparty = require('multiparty');
- 
- 
+ , qs = require('querystring')
+ , multiparty = require('multiparty')
+ , spawn = require('child_process').spawn
+ , uuid = require('node-uuid'); 
  
  
  
 var masterArray = [];
 setInterval(function() {
-	fs.readFile('./../master.js', function (err, data) {
+	fs.readFile('master.js', function (err, data) {
 		if (err) {
 			console.log("Couldn't read from master.js")
 		} else {
-			masterArray = JSON.parse(data);
+			var _masterArray = JSON.parse(data);
+			masterArray = [];
 			
-			var i, l = masterArray.length;
-			for(i=0; i<l; i+=1) {
-				var link = "../" + masterArray[i].template;
-				var img = fs.readFileSync(link);
-				masterArray[i]["_img"] = img;
-			}
+			var filterTrue = [];
+			_masterArray.forEach(function(value) {
+				if (value.active) {
+					masterArray.push(value);
+				}
+			});
 		}
 	});
 }, 1000);
 
  
  
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-
-
-var controller = {
-	
-	// Gets clips and their votes from the database 
-	getClips: function(res, connection) {
-		res.end("");
-	}
-};
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -90,21 +74,28 @@ function getTemplateLinks(res, page) {
 		if (i >= l) {
 			return result;
 		}
-		result.push("../" + masterArray[i].template);
+		result.push(masterArray[i].template);
 	}
 	return result;
 }
 
-function getImage(src) {
+function getCreatedLinks(newFilename) {
 	var i, l = masterArray.length;
+	var result = [];
 	for(i=0; i<l; i+=1) {
-		//console.log(masterArray[i].template);
-		if ("/" + masterArray[i].template == src) {
-			return masterArray[i]["_img"];
+		var newLink = masterArray[i].result + newFilename;
+		if (fs.existsSync(newLink)) {
+			result.push(newLink);
 		}
 	}
+	return result;
 }
-var uploadDirectory = 'images/';
+
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+
 // http://localhost:41302/template/card1/business-card.jpg
 var PORT = 41302;
 http.createServer(function (req, res) {
@@ -114,69 +105,84 @@ http.createServer(function (req, res) {
 	
 	if (segmentLength > 0) {
 		
-		if (segmentLength > 1 && paramsArray[0] == "template") {
-			if (!isNaN(paramsArray[1])) {
+		if (segmentLength > 1) {
+
+			if (paramsArray[0] == "template" && !isNaN(paramsArray[1])) {
 				var page = parseInt(paramsArray[1], 10);
 				var result = JSON.stringify(getTemplateLinks(res, page));
 				
 				WriteHeaderMode('text/html', res, 200);
 				res.end(result);
-			} else {
-				//console.log(req.url);
-				var img = getImage(req.url);
+			} else if (paramsArray[0] == "template" || paramsArray[0] == "result") {
+				var requestURL = "." + req.url.toLowerCase();
+				//console.log(requestURL);
 				
-				WriteHeaderMode('image/png', res, 200);
-				res.end(img, 'binary');
+				if (fs.existsSync(requestURL) && (
+					endsWith(requestURL, ".png") ||
+					endsWith(requestURL, ".jpg") || 
+					endsWith(requestURL, ".jpeg")
+					))  {
+					fs.readFile(requestURL, function(err, data) {
+						if (err) {
+							WriteHeaderMode('text/html', res, 200);
+							res.end();
+						} else {
+							WriteHeaderMode('image/png', res, 200);
+							res.end(data, 'binary');
+						}
+					});
+				} else {
+					WriteHeaderMode('text/html', res, 200);
+					res.end();
+				}
 			}
 		} else if (paramsArray[0] == "process") {
-			console.log("hi");
-
-			
             var form = new multiparty.Form();
             form.parse(req);
 			
             form.on('file', function(name, file) {
-                var saveFilePath = uploadDirectory + file.originalFilename;
-                console.log(file.path);
-				console.log(saveFilePath);
-				fs.rename(file.path, saveFilePath, function(err) {
-                    if (err) {
-                        // Handle problems with file saving
-						console.log("error");
-						console.log(JSON.stringify(err));
-                        WriteHeaderMode('text/html', res, 200);
+                //console.log(file.path);
+				var newFilename = uuid.v4()+'.png';
+				var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename]);
+				
+				child.on('close', function (exitCode) {
+					
+					if (exitCode === 0) {
+						console.log("finished with code: " + exitCode);
+						
+						var createdList = getCreatedLinks(newFilename);
+						
+						WriteHeaderMode('text/html', res, 200);
+						res.end(JSON.stringify(createdList));
+					} else {	
+						console.error('Something went wrong!');
+						
+						WriteHeaderMode('text/html', res, 200);
 						res.end();
-                    } else {
-                        // Respond to the successful upload with JSON.
-                        // Use a location key to specify the path to the saved image resource.
-                        // { location : '/your/uploaded/image/file'}
-                        var textboxResponse = JSON.stringify({
-                            location: saveFilePath
-                        });
-	
-						console.log(textboxResponse);
-                        // If your script needs to receive cookies, set images.upload.credentials:true in
-                        // the Textbox.io configuration and enable the following two headers.
-                        // res.setHeader('Access-Control-Allow-Credentials', 'true');
-                        // res.setHeader('P3P', 'CP="There is no P3P policy."');
-                        WriteHeaderMode('text/html', res, 200);
-						res.end();
-                    }
-                });
+					}
+				});
+
+				// If you’re really just passing it through, though, pass {stdio: 'inherit'}
+				// to child_process.spawn instead.
+				child.stderr.on('data', function (data) {
+					console.log(data);
+					process.stderr.write(data);
+					
+					
+					WriteHeaderMode('text/html', res, 200);
+					res.end();
+				});
+			
             });
             form.on('error', function(err) {
 				console.log(JSON.stringify(err));
 				WriteHeaderMode('text/html', res, 200);
 				res.end();
             });
-
-			
-
 		} else {
 			WriteHeaderMode('text/html', res, 200);
 			res.end();
 		}
-		
 	} else {
 		// send back the index.html page
 		fs.readFile('./index.html', function (err, data) {
@@ -187,4 +193,6 @@ http.createServer(function (req, res) {
 	}
 }).listen(PORT);
 
-console.log('Server running at http://127.0.0.1:' + PORT + '/');
+//console.log('Server running at http://127.0.0.1:' + PORT + '/');
+console.log('Server running at cms-chorus.utsc.utoronto.ca:' + PORT + '/');
+// cms-chorus.utsc.utoronto.ca:41302
