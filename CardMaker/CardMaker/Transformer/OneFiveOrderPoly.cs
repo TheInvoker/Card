@@ -6,7 +6,7 @@ namespace CardMaker
 {
     class OneFiveOrderPoly : Transformer
     {
-        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
+        public override void GenerateMapping(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
         {
             double[,] X = new double[4, 4];
             double[] Y = new double[4];

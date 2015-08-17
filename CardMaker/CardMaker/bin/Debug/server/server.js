@@ -96,7 +96,6 @@ function endsWith(str, suffix) {
 }
 
 
-// http://localhost:41302/template/card1/business-card.jpg
 var PORT = 41302;
 http.createServer(function (req, res) {
     // get the array of parameters
@@ -115,8 +114,7 @@ http.createServer(function (req, res) {
 				res.end(result);
 			} else if (paramsArray[0] == "template" || paramsArray[0] == "result") {
 				var requestURL = "." + req.url.toLowerCase();
-				//console.log(requestURL);
-				
+
 				if (fs.existsSync(requestURL) && (
 					endsWith(requestURL, ".png") ||
 					endsWith(requestURL, ".jpg") || 
@@ -141,11 +139,15 @@ http.createServer(function (req, res) {
             form.parse(req);
 			
             form.on('file', function(name, file) {
-                //console.log(file.path);
+				console.log("Detected image: " + file.path);
+				
+				
 				var newFilename = uuid.v4()+'.png';
 				var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename]);
 				
 				child.on('close', function (exitCode) {
+					fs.unlink(file.path, function(){
+					});
 					
 					if (exitCode === 0) {
 						console.log("finished with code: " + exitCode);
@@ -165,9 +167,10 @@ http.createServer(function (req, res) {
 				// If you’re really just passing it through, though, pass {stdio: 'inherit'}
 				// to child_process.spawn instead.
 				child.stderr.on('data', function (data) {
-					console.log(data);
-					process.stderr.write(data);
+					fs.unlink(file.path, function(){
+					});
 					
+					process.stderr.write(data);
 					
 					WriteHeaderMode('text/html', res, 200);
 					res.end();
@@ -195,4 +198,3 @@ http.createServer(function (req, res) {
 
 //console.log('Server running at http://127.0.0.1:' + PORT + '/');
 console.log('Server running at cms-chorus.utsc.utoronto.ca:' + PORT + '/');
-// cms-chorus.utsc.utoronto.ca:41302

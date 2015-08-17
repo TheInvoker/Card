@@ -6,7 +6,7 @@ namespace CardMaker
 {
     class Bilinear : Transformer
     {
-        public override void DrawShape(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
+        public override void GenerateMapping(int w, int h, Shape original, Shape warped, Dictionary<Point, Point> mapping)
         {
             double xOff = original.GetTopLeftPixel().GetX();
             double yOff = original.GetTopLeftPixel().GetY();

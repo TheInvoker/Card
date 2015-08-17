@@ -5,6 +5,6 @@ namespace CardMaker
 {
     abstract class Transformer
     {
-        public abstract void DrawShape(int w, int h, Shape origShape, Shape warpedShape, Dictionary<Point, Point> mapping);
+        public abstract void GenerateMapping(int w, int h, Shape origShape, Shape warpedShape, Dictionary<Point, Point> mapping);
     }
 }

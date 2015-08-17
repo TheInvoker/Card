@@ -1,18 +1,87 @@
  <!DOCTYPE html>
 <html>
 <head>
-<title>Title of the document</title>
+	<title>PlutoMake</title>
+
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script>
+		function sendData(formData) {
+			$.ajax({
+				type: 'POST',
+				url: "/process",
+				data: formData,
+				dataType: 'json',
+				contentType:false,
+				cache:false,
+				processData:false,
+				timeout: 30 * 1000,
+				beforeSend: function( xhr ) {
+					$("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
+				},
+				success: function(jsonData,status,xhr) {
+					var str = "";
+					for(var i=0; i<jsonData.length; i+=1) {
+						str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
+					}
+					$("#images").html(str);
+				},
+				error: function(data,status,xhr) {
+					alert(xhr);
+				}
+			});
+		}
+	
+		$(document).ready(function() {
+			$("#plutoupload").on('submit', function() {
+				var formData = new FormData(this);
+				sendData(formData);
+				return false;
+			});
+			
+			
+			
+			var doc = document.getElementById("dnd");
+			doc.ondragover = function () { this.className = 'hover'; return false; };
+			doc.ondragend = function () { this.className = ''; return false; };
+			doc.ondrop = function (event) {
+				event.preventDefault && event.preventDefault();
+				this.className = '';
+
+				// now do something with:
+				var files = event.dataTransfer.files;
+				
+				var formImage = new FormData();
+				formImage.append('fileToUpload', files[0]);
+				sendData(formImage);
+
+				return false;
+			};
+		});
+	</script>
+
+	<style>
+		#dnd {
+			border:2px dashed gray;
+			width:200px;
+			height:200px;
+		}
+		.hover {
+			border:2px dashed red;
+		}
+	</style>
 </head>
 
 <body>
-The content of the document......
 
-<form action="/process" method="post" enctype="multipart/form-data">
-    Select image to upload:
-    <input type="file" name="fileToUpload" id="fileToUpload">
-    <input type="submit" value="Upload Image" name="submit">
-</form>
+	<div id="dnd">
+		<form id="plutoupload" action="/process" method="post" enctype="multipart/form-data">
+			Select image to upload:
+			<input id="uploadfield" name="fileToUpload" type="file" accept="image/*;capture=camera" capture="camera">
+			<input type="submit" value="Upload Image" name="submit">
+		</form>
+	</div>
 
+	<div id="images"></div>
 
 </body>
 

@@ -6,7 +6,7 @@ namespace CardMaker
 {
     class Perspective : Transformer
     {
-        public override void DrawShape(int width, int height, Shape original, Shape warped, Dictionary<Point, Point> mapping)
+        public override void GenerateMapping(int width, int height, Shape original, Shape warped, Dictionary<Point, Point> mapping)
         {
             double xOff = original.GetTopLeftPixel().GetX();
             double yOff = original.GetTopLeftPixel().GetY();

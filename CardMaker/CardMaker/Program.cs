@@ -11,35 +11,22 @@ namespace CardMaker
     {
         static void Main(string[] args)
         {
-            List<TemplateRef> files = JsonConvert.DeserializeObject<List<TemplateRef>>(File.ReadAllText("master.js"));
+            string root = "../../../../../PlutoMakeJava/bin/";
+            List<TemplateRef> files = JsonConvert.DeserializeObject<List<TemplateRef>>(File.ReadAllText(root + "master.js"));
 
             foreach(TemplateRef template in files)
             {
                 if (template.active)
                 {
-                    BatchGenerateMapping(template.grid, template.warp, template.transformer, template.mapping, template.metadata);
+                    BatchGenerateMapping(
+                        root + template.grid,
+                        root + template.warp, 
+                        template.transformer,
+                        root + template.mapping,
+                        root + template.metadata
+                    );
                 }
             }
-
-            Console.WriteLine("Enter path to image:");
-            String logoPath = Console.ReadLine();
-            while (!File.Exists(logoPath))
-            {
-                Console.WriteLine("Invalid path!");
-                logoPath = Console.ReadLine();
-            }
-
-            
-            /*
-            foreach (TemplateRef template in files)
-            {
-                if (template.active)
-                {
-                    BatchGenerateResult(logoPath, template.template, template.mapping, template.metadata, template.result, template.filter, template.mask, template.x, template.y, template.w, template.h);
-                }
-            }
-            */
-            
 
             Console.WriteLine("Complete!");
             Console.ReadLine();
@@ -75,7 +62,7 @@ namespace CardMaker
 
         private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
-            if (!CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
+            if (true || !CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
             {
                 Bitmap origImage = new Bitmap(gridPath);
                 Bitmap warpedImage = new Bitmap(warpPath);
@@ -98,42 +85,12 @@ namespace CardMaker
 
                 List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
 
-                Dictionary<Point, Point> mapping = GenerateWarpedImage(ShapeList, transformerobj, origImage.Width, origImage.Height);
+                Dictionary<Point, Point> mapping = GenerateMapping(ShapeList, transformerobj, origImage.Width, origImage.Height);
                 MyJSON.SaveMapping(origImage.Width, origImage.Height, mapping, transformer, mappingPath, metadataPath);
 
                 origImage.Dispose();
                 warpedImage.Dispose();
             }
-        }
-
-        private static void BatchGenerateResult(string logoPath, string templatePath, string mappingPath, string metadataPath, string resultPath, string filter, string maskPath, int x, int y, int w, int h)
-        {
-            ColorFilter filterobj;
-            switch (filter)
-            {
-                case "none":
-                    filterobj = new NoFilter();
-                    break;
-                case "darken":
-                    filterobj = new Darken();
-                    break;
-                case "vividlight":
-                    filterobj = new VividLight();
-                    break;
-                default:
-                    throw new InvalidDataException("Invalid filter argument");
-            }
-
-            MetaDataRef metadata = JsonConvert.DeserializeObject<MetaDataRef>(File.ReadAllText(metadataPath));
-
-            Dictionary<Point, Point> mapping = MyJSON.ReadMapping(mappingPath);
-
-            Bitmap warpedimage = Exporter.GenerateWarpedLogo(logoPath, maskPath, mapping, metadata.width, metadata.height);
-            Exporter.StampLogo(templatePath, resultPath, x, y, w, h, warpedimage, filterobj);
-
-            warpedimage.Save("warpedlogo.png");
-
-            warpedimage.Dispose();
         }
 
         private static List<KeyValuePair<Shape, Shape>> CreateShapeMapping(Bitmap origImage, Bitmap warpedImage, string origOut, string warpOut)
@@ -152,13 +109,13 @@ namespace CardMaker
             return ShapeList;
         }
 
-        private static Dictionary<Point, Point> GenerateWarpedImage(List<KeyValuePair<Shape, Shape>> ShapeList, Transformer transformer, int w, int h)
+        private static Dictionary<Point, Point> GenerateMapping(List<KeyValuePair<Shape, Shape>> ShapeList, Transformer transformer, int w, int h)
         {
             Dictionary<Point, Point> mapping = new Dictionary<Point, Point>();
 
             foreach (KeyValuePair<Shape, Shape> pair in ShapeList)
             {
-                transformer.DrawShape(w, h, pair.Key, pair.Value, mapping);
+                transformer.GenerateMapping(w, h, pair.Key, pair.Value, mapping);
             }
 
             return mapping;
