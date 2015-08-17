@@ -12,6 +12,8 @@
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
 
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
     <!-- Custom styles for this template -->
     <link href="css/main.css" rel="stylesheet">
     
@@ -68,11 +70,13 @@
               <p>Description goes here ipsum lorem some dummy text taking some space you should totally download</p>
               <hr>
 
-              <form id="upload" method="post" action="upload.php" enctype="multipart/form-data">
+
+              <form id="upload" action="/process" method="post" enctype="multipart/form-data">
                   <div id="drop">
                     Drop Here
 
                     <a>Browse</a>
+
                     <input type="file" name="upl" multiple />
                   </div>
 
@@ -111,7 +115,6 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="../../dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>

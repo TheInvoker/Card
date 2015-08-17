@@ -1,3 +1,30 @@
+function sendData(jqXHR) {
+        $.ajax({
+            type: 'POST',
+            url: "/process",
+            data: formData,
+            dataType: 'json',
+            contentType:false,
+            cache:false,
+            processData:false,
+            timeout: 30 * 1000,
+            beforeSend: function( xhr ) {
+                $("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
+            },
+            success: function(jsonData,status,xhr) {
+                var str = "";
+                for(var i=0; i<jsonData.length; i+=1) {
+                    str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
+                }
+                $("#images").html(str);
+            },
+            error: function(data,status,xhr) {
+                alert(xhr);
+            }
+        });
+    }
+
+
 $(function(){
 
     var ul = $('#upload ul');
@@ -45,7 +72,10 @@ $(function(){
             });
 
             // Automatically upload the file once it is added to the queue
-            var jqXHR = data.submit();
+            // var jqXHR = data.submit();
+            var jqXHR = new FormData(this);
+            sendData(jqXHR);
+            return false;
         },
 
         progress: function(e, data){
