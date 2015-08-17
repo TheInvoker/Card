@@ -11,7 +11,7 @@ namespace CardMaker
     {
         static void Main(string[] args)
         {
-            string root = "../../../../../PlutoMakeJava/bin/";
+            string root = "../../../../../PlutoMakeJava/PlutoMakeJava/bin/";
             List<TemplateRef> files = JsonConvert.DeserializeObject<List<TemplateRef>>(File.ReadAllText(root + "master.js"));
 
             foreach(TemplateRef template in files)
@@ -62,7 +62,7 @@ namespace CardMaker
 
         private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
-            if (true || !CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
+            if (!CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
             {
                 Bitmap origImage = new Bitmap(gridPath);
                 Bitmap warpedImage = new Bitmap(warpPath);
