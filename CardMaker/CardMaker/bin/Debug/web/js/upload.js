@@ -1,125 +1,62 @@
-function sendData(jqXHR) {
-        $.ajax({
-            type: 'POST',
-            url: "/process",
-            data: formData,
-            dataType: 'json',
-            contentType:false,
-            cache:false,
-            processData:false,
-            timeout: 30 * 1000,
-            beforeSend: function( xhr ) {
-                $("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
-            },
-            success: function(jsonData,status,xhr) {
-                var str = "";
-                for(var i=0; i<jsonData.length; i+=1) {
-                    str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
-                }
-                $("#images").html(str);
-            },
-            error: function(data,status,xhr) {
-                alert(xhr);
-            }
-        });
-    }
+function sendData(formData) {
+	$.ajax({
+		type: 'POST',
+		url: "http://cms-chorus.utsc.utoronto.ca:41302/process",
+		data: formData,
+		dataType: 'json',
+		contentType:false,
+		cache:false,
+		processData:false,
+		timeout: 30 * 1000,
+		beforeSend: function( xhr ) {
+			$("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
+		},
+		success: function(jsonData,status,xhr) {
+			var str = "";
+			for(var i=0; i<jsonData.length; i+=1) {
+				str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
+			}
+			$("#images").html(str);
+		},
+		error: function(data,status,xhr) {
+			alert(xhr);
+		}
+	});
+}
 
+$(document).ready(function() {
+	$("#upload").on('submit', function() {
+		var formData = new FormData(this);
+		sendData(formData);
+		return false;
+	});
+	
+	var doc = document.getElementById("drop");
+	doc.ondragover = function () { 
+		this.className = 'hover'; 
+		return false; 
+	};
+	$(doc).on('dragleave dragstop drop', function() {
+		this.className = ''; 
+		return false; 
+	});
+	doc.ondrop = function (event) {
+		event.preventDefault && event.preventDefault();
 
-$(function(){
+		var files = event.dataTransfer.files;
+		var formImage = new FormData();
+		formImage.append('fileToUpload', files[0]);
+		sendData(formImage);
 
-    var ul = $('#upload ul');
-
+		return false;
+	};
+	
     $('#drop a').click(function(){
         // Simulate a click on the file input button
         // to show the file browser dialog
-        $(this).parent().find('input').click();
+        $(this).next('input').click();
     });
-
-    // Initialize the jQuery File Upload plugin
-    $('#upload').fileupload({
-
-        // This element will accept file drag/drop uploading
-        dropZone: $('#drop'),
-
-        // This function is called when a file is added to the queue;
-        // either via the browse button, or via drag/drop:
-        add: function (e, data) {
-
-            var tpl = $('<li class="working"><input type="text" value="0" data-width="48" data-height="48"'+
-                ' data-fgColor="#0788a5" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span></span></li>');
-
-            // Append the file name and file size
-            tpl.find('p').text(data.files[0].name)
-                         .append('<i>' + formatFileSize(data.files[0].size) + '</i>');
-
-            // Add the HTML to the UL element
-            data.context = tpl.appendTo(ul);
-
-            // Initialize the knob plugin
-            tpl.find('input').knob();
-
-            // Listen for clicks on the cancel icon
-            tpl.find('span').click(function(){
-
-                if(tpl.hasClass('working')){
-                    jqXHR.abort();
-                }
-
-                tpl.fadeOut(function(){
-                    tpl.remove();
-                });
-
-            });
-
-            // Automatically upload the file once it is added to the queue
-            // var jqXHR = data.submit();
-            var jqXHR = new FormData(this);
-            sendData(jqXHR);
-            return false;
-        },
-
-        progress: function(e, data){
-
-            // Calculate the completion percentage of the upload
-            var progress = parseInt(data.loaded / data.total * 100, 10);
-
-            // Update the hidden input field and trigger a change
-            // so that the jQuery knob plugin knows to update the dial
-            data.context.find('input').val(progress).change();
-
-            if(progress == 100){
-                data.context.removeClass('working');
-            }
-        },
-
-        fail:function(e, data){
-            // Something has gone wrong!
-            data.context.addClass('error');
-        }
-
-    });
-
-
-    // Prevent the default action when a file is dropped on the window
-    $(document).on('drop dragover', function (e) {
-        e.preventDefault();
-    });
-
-    // Helper function that formats the file sizes
-    function formatFileSize(bytes) {
-        if (typeof bytes !== 'number') {
-            return '';
-        }
-
-        if (bytes >= 1000000000) {
-            return (bytes / 1000000000).toFixed(2) + ' GB';
-        }
-
-        if (bytes >= 1000000) {
-            return (bytes / 1000000).toFixed(2) + ' MB';
-        }
-
-        return (bytes / 1000).toFixed(2) + ' KB';
-    }
-
+     $("#drop input").change(function (){
+       $("#upload").submit();
+     });
 });
