@@ -119,19 +119,22 @@ nav.page-nav {
 	padding:15px;
 }
 
-.detail-preview .preview, .all-previews .preview {
-	max-width:65%;
-}
-
 .detail-preview .preview img, .all-previews .preview img {
 	max-width:100%;
 }
 
 .detail-preview .details  {
-    position: static;
+    position: relative;
 }
 
+.details-sidebar {
+	position:absolute;
+}
 
+.affix {
+	position:fixed!important;
+	top:0;
+}
 
 .all-previews .preview {
 	margin-top:30px;
