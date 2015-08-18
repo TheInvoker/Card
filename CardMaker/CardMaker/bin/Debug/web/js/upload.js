@@ -1,7 +1,9 @@
 function sendData(formData) {
-    $.ajax({
+    var url = "http://cms-chorus.utsc.utoronto.ca:41302";
+	
+	$.ajax({
         type: 'POST',
-        url: "http://cms-chorus.utsc.utoronto.ca:41302/process",
+        url: url + "/process",
         data: formData,
         dataType: 'json',
         contentType:false,
@@ -9,14 +11,14 @@ function sendData(formData) {
         processData:false,
         timeout: 30 * 1000,
         beforeSend: function( xhr ) {
-            $("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
+            $("div.row.all-previews").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
         },
         success: function(jsonData,status,xhr) {
             var str = "";
             for(var i=0; i<jsonData.length; i+=1) {
-                str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
+				str += "<div class='col-md-8 preview'><img src='"+url+"/"+jsonData[i]+"'></img></div>";
             }
-            $("#images").html(str);
+            $("div.row.all-previews").html(str);
         },
         error: function(data,status,xhr) {
             alert(xhr);
