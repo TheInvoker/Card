@@ -123,8 +123,13 @@ nav.page-nav {
 	max-width:100%;
 }
 
+.detail-preview .col-md-8.preview {
+	padding-right:20px;
+}
+
 .detail-preview .details  {
     position: relative;
+    float:right;
 }
 
 .details-sidebar {
@@ -141,7 +146,7 @@ nav.page-nav {
 }
 
 .all-previews .preview:first-child {
-	margin-top:26px;
+	margin-top:0px;
 }
 
 /* upload */
@@ -199,4 +204,8 @@ nav.page-nav {
     padding: 15px;
     height: 52px;
     position: relative;
+}
+
+.hover {
+	border:2px dashed red !important;
 }
