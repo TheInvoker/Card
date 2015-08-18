@@ -65,6 +65,7 @@
             </div>
             
             <div class="col-md-4 details">
+              <div class="bs-docs-sidebar" data-spy="affix" data-offset-top="130" data-offset-bottom="100">
               <h2>Template Title</h2>
               <hr>
               <p>Description goes here ipsum lorem some dummy text taking some space you should totally download</p>
@@ -76,8 +77,8 @@
                     Drop Here
 
                     <a>Browse</a>
-
-                    <input type="file" name="upl" multiple />
+                    <input id="uploadfield" name="fileToUpload" type="file" accept="image/*;capture=camera" capture="camera">
+                    <input type="file" value="Upload Image" name="upl" multiple />
                   </div>
 
                   <ul>
@@ -87,7 +88,7 @@
                 </form>
 
                 <p class="italic">Want to see how your designs look on this template? Drag and drop your design into the box above!</p>
-
+              </div>
             </div>
       </div>
 
@@ -115,9 +116,9 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
     
     <!-- JavaScript Includes -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>

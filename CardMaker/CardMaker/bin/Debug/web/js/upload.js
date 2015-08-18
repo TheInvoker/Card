@@ -1,30 +1,3 @@
-function sendData(jqXHR) {
-        $.ajax({
-            type: 'POST',
-            url: "/process",
-            data: formData,
-            dataType: 'json',
-            contentType:false,
-            cache:false,
-            processData:false,
-            timeout: 30 * 1000,
-            beforeSend: function( xhr ) {
-                $("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
-            },
-            success: function(jsonData,status,xhr) {
-                var str = "";
-                for(var i=0; i<jsonData.length; i+=1) {
-                    str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
-                }
-                $("#images").html(str);
-            },
-            error: function(data,status,xhr) {
-                alert(xhr);
-            }
-        });
-    }
-
-
 $(function(){
 
     var ul = $('#upload ul');
@@ -46,7 +19,7 @@ $(function(){
         add: function (e, data) {
 
             var tpl = $('<li class="working"><input type="text" value="0" data-width="48" data-height="48"'+
-                ' data-fgColor="#0788a5" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span></span></li>');
+                ' data-fgColor="#0788a5" data-readOnly="1" data-bgColor="#fff" /><p></p><span></span></li>');
 
             // Append the file name and file size
             tpl.find('p').text(data.files[0].name)
@@ -72,10 +45,7 @@ $(function(){
             });
 
             // Automatically upload the file once it is added to the queue
-            // var jqXHR = data.submit();
-            var jqXHR = new FormData(this);
-            sendData(jqXHR);
-            return false;
+            var jqXHR = data.submit();
         },
 
         progress: function(e, data){

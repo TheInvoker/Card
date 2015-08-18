@@ -127,8 +127,11 @@ nav.page-nav {
 	max-width:100%;
 }
 
-.detail-preview .details {
-    position: static}
+.detail-preview .details  {
+    position: static;
+}
+
+
 
 .all-previews .preview {
 	margin-top:30px;
