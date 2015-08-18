@@ -1,5 +1,6 @@
 function sendData(formData) {
     var url = "http://cms-chorus.utsc.utoronto.ca:41302";
+	$("#drop input").val("");
 	
 	$.ajax({
         type: 'POST',
@@ -11,6 +12,7 @@ function sendData(formData) {
         processData:false,
         timeout: 30 * 1000,
         beforeSend: function( xhr ) {
+			var f = $("div.row.all-previews");
             $("div.row.all-previews").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
         },
         success: function(jsonData,status,xhr) {
@@ -58,7 +60,9 @@ $(document).ready(function() {
         // to show the file browser dialog
         $(this).next('input').click();
     });
-     $("#drop input").change(function (){
-       $("#upload").submit();
+     $("#drop input").on('change', function () {
+		if ($(this).val().trim() != "") {
+			$("#upload").submit();
+	    }
      });
 });
