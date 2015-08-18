@@ -11,7 +11,7 @@ function sendData(formData) {
         processData:false,
         timeout: 30 * 1000,
         beforeSend: function( xhr ) {
-            $("div.row.all-previews").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
+            $("div.row.all-previews").html("<img class=\"all-previews-loader\" src='images/icons/loader.gif'></img>");
         },
         success: function(jsonData,status,xhr) {
             var str = "";
