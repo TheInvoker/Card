@@ -143,10 +143,16 @@ nav.page-nav {
 
 .all-previews .preview {
 	margin-top:30px;
+
 }
 
 .all-previews .preview:first-child {
 	margin-top:0px;
+}
+
+.all-previews-loader {
+	padding-left:390px;
+	padding-top:10px;
 }
 
 /* upload */
