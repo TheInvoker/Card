@@ -119,15 +119,15 @@ nav.page-nav {
 	padding:15px;
 }
 
-.detail-preview .preview img, .all-previews .preview img {
+.all-previews .preview img {
 	max-width:100%;
 }
 
-.detail-preview .col-md-8.preview {
+.detail-upload .col-md-8.preview {
 	padding-right:20px;
 }
 
-.detail-preview .details  {
+.detail-upload .details  {
     position: relative;
     float:right;
 }
