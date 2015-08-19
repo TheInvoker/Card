@@ -27,6 +27,15 @@ setInterval(function() {
 	});
 }, 1000);
 
+
+var html = "";
+fs.readFile('./index.html', function (err, data) {
+	if (err) {
+		console.log("Error reading html file...");
+	} else {
+		html = data;
+	}
+});
  
  
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -123,7 +132,7 @@ http.createServer(function (req, res) {
 					fs.readFile(requestURL, function(err, data) {
 						if (err) {
 							WriteHeaderMode('text/html', res, 200);
-							res.end();
+							res.end("[]");
 						} else {
 							WriteHeaderMode('image/png', res, 200);
 							res.end(data, 'binary');
@@ -131,7 +140,7 @@ http.createServer(function (req, res) {
 					});
 				} else {
 					WriteHeaderMode('text/html', res, 200);
-					res.end();
+					res.end("[]");
 				}
 			}
 		} else if (paramsArray[0] == "process") {
@@ -140,7 +149,6 @@ http.createServer(function (req, res) {
 			
             form.on('file', function(name, file) {
 				console.log("Detected image: " + file.path);
-				
 				
 				var newFilename = uuid.v4()+'.png';
 				var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename]);
@@ -160,7 +168,7 @@ http.createServer(function (req, res) {
 						console.error('Something went wrong!');
 						
 						WriteHeaderMode('text/html', res, 200);
-						res.end();
+						res.end("[]");
 					}
 				});
 
@@ -173,26 +181,23 @@ http.createServer(function (req, res) {
 					process.stderr.write(data);
 					
 					WriteHeaderMode('text/html', res, 200);
-					res.end();
+					res.end("[]");
 				});
 			
             });
             form.on('error', function(err) {
 				console.log(JSON.stringify(err));
 				WriteHeaderMode('text/html', res, 200);
-				res.end();
+				res.end("[]");
             });
 		} else {
 			WriteHeaderMode('text/html', res, 200);
-			res.end();
+			res.end("[]");
 		}
 	} else {
 		// send back the index.html page
-		fs.readFile('./index.html', function (err, data) {
-			WriteHeaderMode('text/html', res, 200);
-			if (err) res.end();
-			res.end(data);
-		});
+		WriteHeaderMode('text/html', res, 200);
+		res.end(html);
 	}
 }).listen(PORT);
 

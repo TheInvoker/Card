@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -12,8 +11,9 @@ namespace CardMaker
         public static void SaveMapping(int width, int height, Dictionary<Point, Point> dict, string transformer, string outPath, string metadataPath)
         {
             StringBuilder builder = new StringBuilder();
+            string val = string.Format("{0}", cantor_pair_calculate(width, height));
+            builder.Append(val);
 
-            builder.Append(string.Format("{0},{1}", width, height));
             for (int y = 0; y < height; y += 1)
             {
                 for (int x = 0; x < width; x += 1)
@@ -22,16 +22,17 @@ namespace CardMaker
                     if (dict.ContainsKey(newPoint))
                     {
                         Point mappedPoint = dict[newPoint];
-                        builder.Append(string.Format(",{0},{1}", mappedPoint.X, mappedPoint.Y));
+                        builder.Append(string.Format(",{0}", cantor_pair_calculate(mappedPoint.X, mappedPoint.Y)));
                     } else
                     {
-                        builder.Append(",,");
+                        builder.Append(",");
                     }
                 }
             }
+
             string finalstring = builder.ToString();
-            
-            Regex rx = new Regex("(,,+)($|,\\d)");
+
+            Regex rx = new Regex("(,+)($|,\\d)");
             finalstring = rx.Replace(finalstring, new MatchEvaluator(delegate (Match m)
             {
                 string commas = m.Groups[1].ToString();
@@ -43,6 +44,14 @@ namespace CardMaker
 
             string json = "{\"transform\":\"" + transformer + "\", \"width\":" + width.ToString() + ", \"height\":" + height.ToString() + "}";
             File.WriteAllText(metadataPath, json);
+        }
+
+        /**
+         * Calculate a unique integer based on two integers (cantor pairing).
+         */
+        private static int cantor_pair_calculate(int x, int y)
+        {
+            return ((x + y) * (x + y + 1)) / 2 + y;
         }
     }
 }

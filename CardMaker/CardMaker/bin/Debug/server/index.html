@@ -38,18 +38,19 @@
 				return false;
 			});
 			
-			
-			
 			var doc = document.getElementById("dnd");
-			doc.ondragover = function () { this.className = 'hover'; return false; };
-			doc.ondragend = function () { this.className = ''; return false; };
+			doc.ondragover = function () { 
+				this.className = 'hover'; 
+				return false; 
+			};
+			$(doc).on('dragleave dragstop drop', function() {
+				this.className = ''; 
+				return false; 
+			});
 			doc.ondrop = function (event) {
 				event.preventDefault && event.preventDefault();
-				this.className = '';
 
-				// now do something with:
 				var files = event.dataTransfer.files;
-				
 				var formImage = new FormData();
 				formImage.append('fileToUpload', files[0]);
 				sendData(formImage);
@@ -61,12 +62,12 @@
 
 	<style>
 		#dnd {
-			border:2px dashed gray;
+			border:4px dashed gray;
 			width:200px;
 			height:200px;
 		}
 		.hover {
-			border:2px dashed red;
+			border:4px dashed red !important;
 		}
 	</style>
 </head>
