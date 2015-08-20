@@ -172,6 +172,11 @@
 			cursor: pointer;
 			cursor: hand;
 		}
+		div.col-sm-6.col-md-4 p {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -199,7 +204,11 @@
 			});
 			
 			$("div.col-sm-6.col-md-4").click(function() {
-				window.location = "detail.html?templateid=" + $(this).attr("templateID") + "&src=" + encodeURIComponent($(this).find("img").attr("src"));
+				localStorage.setItem("id", $(this).attr("templateID"));
+				localStorage.setItem("url", $(this).find("img").attr("src"));
+				localStorage.setItem("title", $(this).find("h2").text());
+				localStorage.setItem("description", $(this).find("p").text());
+				window.location = "detail.html";
 			});
 		});
 	</script>

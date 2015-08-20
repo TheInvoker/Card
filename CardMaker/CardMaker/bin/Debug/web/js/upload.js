@@ -2,7 +2,7 @@ function sendData(formData) {
     var url = "http://cms-chorus.utsc.utoronto.ca:41302";
 	$("#drop input").val("");
 	
-	formData.append('templateName', getURLParameter(window.location, "templateid"));
+	formData.append('templateName', id);
 	formData.append('clientID', myClientID);
 	
 	$.ajax({
@@ -105,8 +105,10 @@ $(document).ready(function() {
 	    }
     });
 	
-	var templateURL = decodeURIComponent(getURLParameter(window.location, "src"));
-	$("div.col-md-8.preview img").attr("src", templateURL);
+	$("div.col-md-8.preview img").attr("src", url);
+	$("div.col-md-4.details h2").text(title);
+	$("div.col-md-4.details p").eq(0).text(description);
+	$("div.breadcrumbs span").last().text(title);
 });
 
 // http://stackoverflow.com/a/9458996/128597
@@ -131,3 +133,7 @@ function getURLParameter(link, name) {
 }
 
 var myClientID = getClientID();
+var id = localStorage.getItem("id");
+var url = localStorage.getItem("url");
+var title = localStorage.getItem("title");
+var description = localStorage.getItem("description");
