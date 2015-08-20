@@ -55,6 +55,7 @@
     <Compile Include="MetaDataRef.cs" />
     <Compile Include="MyJSON.cs" />
     <Compile Include="TemplateRef.cs" />
+    <Compile Include="TemplateRefList.cs" />
     <Compile Include="Transformer\Bilinear.cs" />
     <Compile Include="Transformer\OneFiveOrderPoly.cs" />
     <Compile Include="Transformer\Perspective.cs" />

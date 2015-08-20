@@ -17,16 +17,18 @@ setInterval(function() {
 			var _masterArray = JSON.parse(data);
 			
 			var Temp_masterArray = [];
-			_masterArray.forEach(function(_templateList) {
+			_masterArray.forEach(function(_templateListObj) {
 				
 				var Temp_templateList = [];
-				_templateList.forEach(function(_templateObj) {
+				_templateListObj.angles.forEach(function(_templateObj) {
 					if (_templateObj.active) {
 						Temp_templateList.push(_templateObj);
 					}
 				});
+				
 				if (Temp_templateList.length > 0) {
-					Temp_masterArray.push(Temp_templateList);
+					_templateListObj.angles = Temp_templateList;
+					Temp_masterArray.push(_templateListObj);
 				}
 			});
 			
@@ -85,13 +87,16 @@ function getURLParameter(link, name) {
 
 
 function getTemplateLinks(res, page) {
-	var i, l = masterArray.length;
+	var i, l = masterArray.length, s = 12;
 	var result = [];
-	for(i=page*6; i<(page+1)*6; i+=1) {
-		if (i >= l) {
-			return result;
-		}
-		result.push(masterArray[i][0].template);
+	for(i=page*s; i<Math.min(l, (page+1)*s); i+=1) {
+		var templateObj = masterArray[i].angles[0];
+		result.push({
+			"id" : masterArray[i].id,
+			"title" : masterArray[i].title,
+			"description" : masterArray[i].description,
+			"url" : templateObj.template
+		});
 	}
 	return result;
 }
@@ -99,17 +104,16 @@ function getTemplateLinks(res, page) {
 function getCreatedLink(templateName, newFilename) {
 	var i,j,k,l = masterArray.length;
 	for(i=0; i<l; i+=1) {
-		var llist = masterArray[i];
-		k = llist.length;
-		for(j=0;j<k;j+=1) {
-			var curTemplateName = llist[j].template.split("/")[1];
-			if (curTemplateName != templateName) {
-				continue;
-			}
-			
-			var newLink = llist[j].result + newFilename;
-			if (fs.existsSync(newLink)) {
-				return newLink;
+		var llistobj = masterArray[i];
+		
+		if (llistobj.id == templateName) {
+			var llist = llistobj.angles;
+			k = llist.length;
+			for(j=0;j<k;j+=1) {				
+				var newLink = llist[j].result + newFilename;
+				if (fs.existsSync(newLink)) {
+					return newLink;
+				}
 			}
 		}
 	}
@@ -127,7 +131,7 @@ http.createServer(function (req, res) {
 	var paramsArray = GetURLSegments(req);
 	var segmentLength = paramsArray.length;
 	
-	console.log("hi: " + req.url);
+	//console.log("hi: " + req.url);
 	
 	if (segmentLength > 0) {
 		
@@ -166,6 +170,7 @@ http.createServer(function (req, res) {
             form.parse(req, function(err, fields, files) {
 				var templateName = fields["templateName"][0];
 				var file = files["fileToUpload"][0];
+				var clientID = fields["clientID"][0];
 
 				console.log("Detected image: " + file.path);
 				

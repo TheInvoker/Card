@@ -12,11 +12,11 @@ namespace CardMaker
         static void Main(string[] args)
         {
             string root = "../../../../../PlutoMakeJava/PlutoMakeJava/bin/";
-            List<List<TemplateRef>> files = JsonConvert.DeserializeObject<List<List<TemplateRef>>>(File.ReadAllText(root + "master.js"));
+            List<TemplateRefList> files = JsonConvert.DeserializeObject<List<TemplateRefList>>(File.ReadAllText(root + "master.js"));
 
-            foreach (List<TemplateRef> templatelist in files)
+            foreach (TemplateRefList templatelist in files)
             {
-                foreach (TemplateRef template in templatelist)
+                foreach (TemplateRef template in templatelist.angles)
                 {
                     if (template.active)
                     {
