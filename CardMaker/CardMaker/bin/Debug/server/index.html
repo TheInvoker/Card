@@ -1,89 +1,144 @@
  <!DOCTYPE html>
 <html>
-<head>
-	<title>PlutoMake</title>
-
-	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script>
-		function sendData(formData) {
-			$.ajax({
-				type: 'POST',
-				url: "/process",
-				data: formData,
-				dataType: 'json',
-				contentType:false,
-				cache:false,
-				processData:false,
-				timeout: 30 * 1000,
-				beforeSend: function( xhr ) {
-					$("#images").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
-				},
-				success: function(jsonData,status,xhr) {
-					var str = "";
-					for(var i=0; i<jsonData.length; i+=1) {
-						str += "<img src='"+jsonData[i]+"' style='width:500px;display:block;'/>"
+	<head>
+		<title>PlutoMake</title>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script>
+			function sendData(formData) {
+				formData.append('templateName', "coaster1");
+				
+				$.ajax({
+					type: 'POST',
+					url: "/process",
+					data: formData,
+					dataType: 'binary',
+					responseType:'arraybuffer',
+					contentType:false,
+					cache:false,
+					processData:false,
+					timeout: 30 * 1000,
+					beforeSend: function( xhr ) {
+						$("#imagefield").html("Please wait while I get your images. If you have read this part by now then you are pretty fast at reading.");
+					},
+					success: function(blob,status,xhr) {
+						$("#imagefield").html("<img id=\"CaptchaImg\" src=\"data:image/png;base64," + _arrayBufferToBase64(blob) + "\" style=\"width:500px;display:block;\"/>");
+					},
+					error: function(data,status,xhr) {
+						alert(xhr);
 					}
-					$("#images").html(str);
-				},
-				error: function(data,status,xhr) {
-					alert(xhr);
-				}
-			});
-		}
-	
-		$(document).ready(function() {
-			$("#plutoupload").on('submit', function() {
-				var formData = new FormData(this);
-				sendData(formData);
-				return false;
+				});
+			}
+		
+			$(document).ready(function() {
+				// use this transport for "binary" data type
+				$.ajaxTransport("+binary", function(options, originalOptions, jqXHR) {
+				    // check for conditions and support for blob / arraybuffer response type
+				    if (window.FormData && ((options.dataType && (options.dataType == 'binary')) || (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) || (window.Blob && options.data instanceof Blob))))) {
+				        return {
+				            // create new XMLHttpRequest
+				            send: function(headers, callback) {
+				                // setup all variables
+				                var xhr = new XMLHttpRequest(),
+				                    url = options.url,
+				                    type = options.type,
+				                    async = options.async || true,
+				                    // blob or arraybuffer. Default is blob
+				                    dataType = options.responseType || "blob",
+				                    data = options.data || null;
+
+				                xhr.addEventListener('load', function() {
+				                    var data = {};
+				                    data[options.dataType] = xhr.response;
+				                    // make callback and send data
+				                    callback(xhr.status, xhr.statusText, data, xhr.getAllResponseHeaders());
+				                });
+
+				                xhr.open(type, url, async);
+
+				                // setup custom headers
+				                for (var i in headers) {
+				                    xhr.setRequestHeader(i, headers[i]);
+				                }
+
+				                xhr.responseType = dataType;
+				                xhr.send(data);
+				            },
+				            abort: function() {
+				                jqXHR.abort();
+				            }
+				        };
+				    }
+				});
+			
+				$("#plutoupload").on('submit', function() {
+					var formData = new FormData(this);
+					sendData(formData);
+					return false;
+				});
+				
+				var doc = document.getElementById("dnd");
+				doc.ondragover = function () { 
+					this.className = 'hover'; 
+					return false; 
+				};
+				$(doc).on('dragleave dragstop drop', function() {
+					this.className = ''; 
+					return false; 
+				});
+				doc.ondrop = function (event) {
+					event.preventDefault && event.preventDefault();
+
+					var files = event.dataTransfer.files;
+					var formImage = new FormData();
+					formImage.append('fileToUpload', files[0]);
+					sendData(formImage);
+
+					return false;
+				};
 			});
 			
-			var doc = document.getElementById("dnd");
-			doc.ondragover = function () { 
-				this.className = 'hover'; 
-				return false; 
+			// http://stackoverflow.com/a/9458996/128597
+			function _arrayBufferToBase64(buffer) {
+				var binary = '';
+				var bytes = new Uint8Array(buffer);
+				var len = bytes.byteLength;
+				for (var i = 0; i < len; i++) {
+					binary += String.fromCharCode(bytes[i]);
+				}
+				return window.btoa(binary);
 			};
-			$(doc).on('dragleave dragstop drop', function() {
-				this.className = ''; 
-				return false; 
-			});
-			doc.ondrop = function (event) {
-				event.preventDefault && event.preventDefault();
+			
+			function getClientID() {
+				return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+					var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);
+				});
+			}
+		</script>
 
-				var files = event.dataTransfer.files;
-				var formImage = new FormData();
-				formImage.append('fileToUpload', files[0]);
-				sendData(formImage);
+		<style>
+			#dnd {
+				border:4px dashed gray;
+				width:200px;
+				height:200px;
+			}
+			.hover {
+				border:4px dashed red !important;
+			}
+		</style>
+	</head>
 
-				return false;
-			};
-		});
-	</script>
+	<body>
 
-	<style>
-		#dnd {
-			border:4px dashed gray;
-			width:200px;
-			height:200px;
-		}
-		.hover {
-			border:4px dashed red !important;
-		}
-	</style>
-</head>
+		<div id="dnd">
+			<form id="plutoupload" action="/process" method="post" enctype="multipart/form-data">
+				Select image to upload:
+				<input id="uploadfield" name="fileToUpload" type="file" accept="image/*;capture=camera" capture="camera">
+				<input type="submit" value="Upload Image" name="submit">
+			</form>
+		</div>
 
-<body>
-
-	<div id="dnd">
-		<form id="plutoupload" action="/process" method="post" enctype="multipart/form-data">
-			Select image to upload:
-			<input id="uploadfield" name="fileToUpload" type="file" accept="image/*;capture=camera" capture="camera">
-			<input type="submit" value="Upload Image" name="submit">
-		</form>
-	</div>
-
-	<div id="images"></div>
-
-</body>
+		<div id="imagefield">
+		</div>
+	</body>
 
 </html> 

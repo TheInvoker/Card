@@ -15,14 +15,22 @@ setInterval(function() {
 			console.log("Couldn't read from master.js")
 		} else {
 			var _masterArray = JSON.parse(data);
-			masterArray = [];
 			
-			var filterTrue = [];
-			_masterArray.forEach(function(value) {
-				if (value.active) {
-					masterArray.push(value);
+			var Temp_masterArray = [];
+			_masterArray.forEach(function(_templateList) {
+				
+				var Temp_templateList = [];
+				_templateList.forEach(function(_templateObj) {
+					if (_templateObj.active) {
+						Temp_templateList.push(_templateObj);
+					}
+				});
+				if (Temp_templateList.length > 0) {
+					Temp_masterArray.push(Temp_templateList);
 				}
 			});
+			
+			masterArray = Temp_masterArray;
 		}
 	});
 }, 1000);
@@ -33,7 +41,7 @@ fs.readFile('./index.html', function (err, data) {
 	if (err) {
 		console.log("Error reading html file...");
 	} else {
-		html = data;
+		html = data.toString();
 	}
 });
  
@@ -83,21 +91,29 @@ function getTemplateLinks(res, page) {
 		if (i >= l) {
 			return result;
 		}
-		result.push(masterArray[i].template);
+		result.push(masterArray[i][0].template);
 	}
 	return result;
 }
 
-function getCreatedLinks(newFilename) {
-	var i, l = masterArray.length;
-	var result = [];
+function getCreatedLink(templateName, newFilename) {
+	var i,j,k,l = masterArray.length;
 	for(i=0; i<l; i+=1) {
-		var newLink = masterArray[i].result + newFilename;
-		if (fs.existsSync(newLink)) {
-			result.push(newLink);
+		var llist = masterArray[i];
+		k = llist.length;
+		for(j=0;j<k;j+=1) {
+			var curTemplateName = llist[j].template.split("/")[1];
+			if (curTemplateName != templateName) {
+				continue;
+			}
+			
+			var newLink = llist[j].result + newFilename;
+			if (fs.existsSync(newLink)) {
+				return newLink;
+			}
 		}
 	}
-	return result;
+	return null;
 }
 
 function endsWith(str, suffix) {
@@ -110,6 +126,8 @@ http.createServer(function (req, res) {
     // get the array of parameters
 	var paramsArray = GetURLSegments(req);
 	var segmentLength = paramsArray.length;
+	
+	console.log("hi: " + req.url);
 	
 	if (segmentLength > 0) {
 		
@@ -145,13 +163,14 @@ http.createServer(function (req, res) {
 			}
 		} else if (paramsArray[0] == "process") {
             var form = new multiparty.Form();
-            form.parse(req);
-			
-            form.on('file', function(name, file) {
+            form.parse(req, function(err, fields, files) {
+				var templateName = fields["templateName"][0];
+				var file = files["fileToUpload"][0];
+
 				console.log("Detected image: " + file.path);
 				
 				var newFilename = uuid.v4()+'.png';
-				var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename]);
+				var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename, templateName]);
 				
 				child.on('close', function (exitCode) {
 					fs.unlink(file.path, function(){
@@ -160,10 +179,25 @@ http.createServer(function (req, res) {
 					if (exitCode === 0) {
 						console.log("finished with code: " + exitCode);
 						
-						var createdList = getCreatedLinks(newFilename);
+						var createdlink = getCreatedLink(templateName, newFilename);
 						
-						WriteHeaderMode('text/html', res, 200);
-						res.end(JSON.stringify(createdList));
+						if (createdlink != null)  {
+							fs.readFile(createdlink, function(err, data) {
+								if (err) {
+									console.log("coldn't read");
+									WriteHeaderMode('text/html', res, 200);
+									res.end("[]");
+								} else {
+									WriteHeaderMode('image/png', res, 200);
+									res.end(data, 'binary');
+								}
+							});
+						} else {
+							console.log("created file not found");
+							WriteHeaderMode('text/html', res, 200);
+							res.end("[]");
+						}
+
 					} else {	
 						console.error('Something went wrong!');
 						
