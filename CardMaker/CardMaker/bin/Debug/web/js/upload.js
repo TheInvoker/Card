@@ -2,7 +2,7 @@ function sendData(formData) {
     var url = "http://cms-chorus.utsc.utoronto.ca:41302";
 	$("#drop input").val("");
 	
-	formData.append('templateName', "bump1");
+	formData.append('templateName', getURLParameter(window.location, "templateid"));
 	formData.append('clientID', myClientID);
 	
 	$.ajax({
@@ -104,6 +104,9 @@ $(document).ready(function() {
 			$("#upload").submit();
 	    }
     });
+	
+	var templateURL = decodeURIComponent(getURLParameter(window.location, "src"));
+	$("div.col-md-8.preview img").attr("src", templateURL);
 });
 
 // http://stackoverflow.com/a/9458996/128597
@@ -121,6 +124,10 @@ function getClientID() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 		var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);
 	});
+}
+
+function getURLParameter(link, name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(link)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
 var myClientID = getClientID();
