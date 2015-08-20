@@ -3,6 +3,7 @@ function sendData(formData) {
 	$("#drop input").val("");
 	
 	formData.append('templateName', "bump1");
+	formData.append('clientID', myClientID);
 	
 	$.ajax({
 		type: 'POST',
@@ -121,3 +122,5 @@ function getClientID() {
 		var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);
 	});
 }
+
+var myClientID = getClientID();
