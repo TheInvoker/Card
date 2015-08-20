@@ -163,10 +163,36 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="../../dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
   
 
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var url = "http://cms-chorus.utsc.utoronto.ca:41302";
+			var page = 0;
+			
+			$.ajax({
+				type: 'POST',
+				url: url + "/template/" + page,
+				data: "{}",
+				dataType: 'json',
+				success: function(json,status,xhr) {
+					$("div.col-sm-6.col-md-4 img").each(function(i, x) {
+						if (i < json.length) {
+							$(x).attr("src", url + "/" + json[i]);
+						}
+					});
+				},
+				error: function(data,status,xhr) {
+					alert(xhr);
+				}
+			});
+		});
+	</script>
+  
+  
 <span id="buffer-extension-hover-button" style="display: none;position: absolute;z-index: 8675309;width: 100px;height: 25px;background-image: url(chrome-extension://noojglkidnpfjbincgijbaiedldjfbhh/data/shared/img/buffer-hover-icon@1x.png);background-size: 100px 25px;opacity: 0.9;cursor: pointer;"></span></body></html>
