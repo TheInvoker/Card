@@ -2,6 +2,8 @@ function sendData(formData) {
     var url = "http://cms-chorus.utsc.utoronto.ca:41302";
 	$("#drop input").val("");
 	
+	formData.append('templateName', "bump1");
+	
 	$.ajax({
 		type: 'POST',
 		url: url + "/process",
