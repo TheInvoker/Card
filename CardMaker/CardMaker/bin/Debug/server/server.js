@@ -38,6 +38,9 @@ setInterval(function() {
 }, 1000);
 
 
+var clientIDObject = {};
+var resultObject = {};
+
 var html = "";
 fs.readFile('./index.html', function (err, data) {
 	if (err) {
@@ -168,61 +171,134 @@ http.createServer(function (req, res) {
 		} else if (paramsArray[0] == "process") {
             var form = new multiparty.Form();
             form.parse(req, function(err, fields, files) {
-				var templateName = fields["templateName"][0];
-				var file = files["fileToUpload"][0];
 				var clientID = fields["clientID"][0];
-
-				console.log("Detected image: " + file.path);
+				var templateName = fields["templateName"][0];
+				var modTime = fields["modTime"][0];
 				
-				var newFilename = uuid.v4()+'.png';
-				var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename, templateName]);
-				
-				child.on('close', function (exitCode) {
-					fs.unlink(file.path, function(){
-					});
+				var file = null;
+				if (files["fileToUpload"] && files["fileToUpload"].length > 0) {
+					file = files["fileToUpload"][0];
 					
-					if (exitCode === 0) {
-						console.log("finished with code: " + exitCode);
-						
-						var createdlink = getCreatedLink(templateName, newFilename);
-						
-						if (createdlink != null)  {
+					console.log("Detected image: " + file.path);
+					
+					if (clientID in clientIDObject) {
+						clientIDObject[clientID].push([file.path, modTime]);
+					} else {
+						clientIDObject[clientID] = [[file.path, modTime]];
+					}
+				} else {
+					console.log("Trying to use saved image with mod time: " + modTime);
+
+					if (clientID in clientIDObject) {
+						var arr = clientIDObject[clientID];
+						for(var i=0;i<arr.length;i+=1) {
+							if (arr[i][1] == modTime) {
+								var savedPath = arr[i][0];
+								if (fs.existsSync(savedPath)) {
+									console.log("Found the image");
+									file = {
+										"path" : savedPath
+									}
+								}
+								break;
+							}
+						}
+					}
+				}
+
+				if (file == null) {
+					WriteHeaderMode('image/png', res, 200);
+					res.end("", 'binary');
+				} else {
+				
+					
+					if (clientID in resultObject && templateName in resultObject[clientID] && modTime in resultObject[clientID][templateName]) {
+						var createdlink = resultObject[clientID][templateName][modTime];
+						if (fs.existsSync(createdlink)) {
 							fs.readFile(createdlink, function(err, data) {
 								if (err) {
 									console.log("coldn't read");
-									WriteHeaderMode('text/html', res, 200);
-									res.end("[]");
+									WriteHeaderMode('image/png', res, 200);
+									res.end("", 'binary');
 								} else {
+									console.log("found generated image");
 									WriteHeaderMode('image/png', res, 200);
 									res.end(data, 'binary');
 								}
 							});
 						} else {
-							console.log("created file not found");
+							WriteHeaderMode('image/png', res, 200);
+							res.end("", 'binary');
+						}
+					} else {
+					
+					
+						var newFilename = uuid.v4()+'.png';
+						var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename, templateName]);
+						
+						child.on('close', function (exitCode) {
+							//fs.unlink(file.path, function(){
+							//});
+							
+							if (exitCode === 0) {
+								console.log("finished with code: " + exitCode);
+								
+								var createdlink = getCreatedLink(templateName, newFilename);
+								
+								var a, b;
+								if (clientID in resultObject) {
+									a = resultObject[clientID];
+								} else {
+									resultObject[clientID] = {};
+									a = resultObject[clientID];
+								}
+								if (templateName in a) {
+									b = a[templateName];
+								} else {
+									a[templateName] = {};
+									b = a[templateName];
+								}
+								b[modTime] = createdlink;
+								//console.log(JSON.stringify(resultObject));
+								
+								if (createdlink != null)  {
+									fs.readFile(createdlink, function(err, data) {
+										if (err) {
+											console.log("coldn't read");
+											WriteHeaderMode('text/html', res, 200);
+											res.end("[]");
+										} else {
+											WriteHeaderMode('image/png', res, 200);
+											res.end(data, 'binary');
+										}
+									});
+								} else {
+									console.log("created file not found");
+									WriteHeaderMode('text/html', res, 200);
+									res.end("[]");
+								}
+
+							} else {	
+								console.error('Something went wrong!');
+								
+								WriteHeaderMode('text/html', res, 200);
+								res.end("[]");
+							}
+						});
+
+						// If you’re really just passing it through, though, pass {stdio: 'inherit'}
+						// to child_process.spawn instead.
+						child.stderr.on('data', function (data) {
+							fs.unlink(file.path, function(){
+							});
+							
+							process.stderr.write(data);
+							
 							WriteHeaderMode('text/html', res, 200);
 							res.end("[]");
-						}
-
-					} else {	
-						console.error('Something went wrong!');
-						
-						WriteHeaderMode('text/html', res, 200);
-						res.end("[]");
+						});
 					}
-				});
-
-				// If you’re really just passing it through, though, pass {stdio: 'inherit'}
-				// to child_process.spawn instead.
-				child.stderr.on('data', function (data) {
-					fs.unlink(file.path, function(){
-					});
-					
-					process.stderr.write(data);
-					
-					WriteHeaderMode('text/html', res, 200);
-					res.end("[]");
-				});
-			
+				}
             });
             form.on('error', function(err) {
 				console.log(JSON.stringify(err));
