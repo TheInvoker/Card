@@ -65,7 +65,7 @@ namespace CardMaker
 
         private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
-            if (!CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
+            if (true || !CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
             {
                 Bitmap origImage = new Bitmap(gridPath);
                 Bitmap warpedImage = new Bitmap(warpPath);

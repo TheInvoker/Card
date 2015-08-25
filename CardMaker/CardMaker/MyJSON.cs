@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace CardMaker
 {
@@ -10,9 +8,10 @@ namespace CardMaker
     {
         public static void SaveMapping(int width, int height, Dictionary<Point, Point> dict, string transformer, string outPath, string metadataPath)
         {
-            StringBuilder builder = new StringBuilder();
-            string val = string.Format("{0}", cantor_pair_calculate(width, height));
-            builder.Append(val);
+            BinaryWriter b = new BinaryWriter(File.Open(outPath, FileMode.Create));
+
+            List<int> ints = new List<int>();
+            ints.Add(cantor_pair_calculate(width, height));
 
             for (int y = 0; y < height; y += 1)
             {
@@ -22,25 +21,27 @@ namespace CardMaker
                     if (dict.ContainsKey(newPoint))
                     {
                         Point mappedPoint = dict[newPoint];
-                        builder.Append(string.Format(",{0}", cantor_pair_calculate(mappedPoint.X, mappedPoint.Y)));
+                        ints.Add(cantor_pair_calculate(mappedPoint.X, mappedPoint.Y));
                     } else
                     {
-                        builder.Append(",");
+                        if (ints[ints.Count-1] < 0)
+                        {
+                            ints[ints.Count-1] -= 1;
+                        } else
+                        {
+                            ints.Add(-1);
+                        }
                     }
                 }
             }
 
-            string finalstring = builder.ToString();
-
-            Regex rx = new Regex("(,+)($|,\\d)");
-            finalstring = rx.Replace(finalstring, new MatchEvaluator(delegate (Match m)
+            foreach(int i in ints)
             {
-                string commas = m.Groups[1].ToString();
-                string next = m.Groups[2].ToString();
-                return string.Format("x{0}{1}", commas.Length, next);
-            }));
+                b.Write(i);
+            }
 
-            File.WriteAllText(outPath, finalstring);
+            b.Dispose();
+            b.Close();
 
             string json = "{\"transform\":\"" + transformer + "\", \"width\":" + width.ToString() + ", \"height\":" + height.ToString() + "}";
             File.WriteAllText(metadataPath, json);
