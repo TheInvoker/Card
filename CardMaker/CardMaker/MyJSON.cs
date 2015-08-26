@@ -8,10 +8,10 @@ namespace CardMaker
     {
         public static void SaveMapping(int width, int height, Dictionary<Point, Point> dict, string transformer, string outPath, string metadataPath)
         {
-            BinaryWriter b = new BinaryWriter(File.Open(outPath, FileMode.Create));
+            Bitmap b = new Bitmap(width, height);
 
-            List<int> ints = new List<int>();
-            ints.Add(cantor_pair_calculate(width, height));
+            int[] buffer = new int[3];
+            int max = 256 * 256 * 256;
 
             for (int y = 0; y < height; y += 1)
             {
@@ -21,27 +21,25 @@ namespace CardMaker
                     if (dict.ContainsKey(newPoint))
                     {
                         Point mappedPoint = dict[newPoint];
-                        ints.Add(cantor_pair_calculate(mappedPoint.X, mappedPoint.Y));
+                        int c = cantor_pair_calculate(mappedPoint.X, mappedPoint.Y);
+
+                        if (c >= max)
+                        {
+                            throw new InvalidDataException("Cantor pairing function value too big!");
+                        }
+
+                        longToRgb(c, buffer);
+
+                        b.SetPixel(x, y, Color.FromArgb(255, buffer[0], buffer[1], buffer[2]));
                     } else
                     {
-                        if (ints[ints.Count-1] < 0)
-                        {
-                            ints[ints.Count-1] -= 1;
-                        } else
-                        {
-                            ints.Add(-1);
-                        }
+                        b.SetPixel(x, y, Color.FromArgb(0, 0, 0, 0));
                     }
                 }
             }
 
-            foreach(int i in ints)
-            {
-                b.Write(i);
-            }
-
+            b.Save(outPath);
             b.Dispose();
-            b.Close();
 
             string json = "{\"transform\":\"" + transformer + "\", \"width\":" + width.ToString() + ", \"height\":" + height.ToString() + "}";
             File.WriteAllText(metadataPath, json);
@@ -53,6 +51,18 @@ namespace CardMaker
         private static int cantor_pair_calculate(int x, int y)
         {
             return ((x + y) * (x + y + 1)) / 2 + y;
+        }
+
+
+        private static void longToRgb(long rgb, int[] buffer)
+        {
+            int r = (int)((rgb & 0xFF0000) >> 16);
+            int g = (int)((rgb & 0x00FF00) >> 8);
+            int b = (int)(rgb & 0x0000FF);
+
+            buffer[0] = r;
+            buffer[1] = g;
+            buffer[2] = b;
         }
     }
 }
