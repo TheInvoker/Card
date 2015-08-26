@@ -67,8 +67,45 @@ namespace CardMaker
         {
             if (true || !CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
             {
-                Bitmap origImage = new Bitmap(gridPath);
-                Bitmap warpedImage = new Bitmap(warpPath);
+                int width, height;
+                List<Shape> gridShapes, warpShapes;
+                QuadRef quadref;
+
+                if (gridPath.StartsWith("["))
+                {
+                    quadref = JsonConvert.DeserializeObject<QuadRef>(File.ReadAllText(gridPath));
+                    List<List<int>> points = quadref.points;
+                    List<int> p1 = points.ElementAt(0);
+                    List<int> p2 = points.ElementAt(1);
+                    List<int> p3 = points.ElementAt(2);
+                    width = p2.ElementAt(0) - p1.ElementAt(0) + 1;
+                    height = p3.ElementAt(1) - p2.ElementAt(1) + 1;
+
+                    gridShapes = SquareDetector.GetShapeFromPoints(points, quadref.hexcolor, width, height, null);
+                } else
+                {
+                    Bitmap origImage = new Bitmap(gridPath);
+                    width = origImage.Width;
+                    height = origImage.Height;
+
+                    gridShapes = SquareDetector.FindSquare(origImage, null);
+                    origImage.Dispose();
+                }
+                if (warpPath.StartsWith("["))
+                {
+                    quadref = JsonConvert.DeserializeObject<QuadRef>(File.ReadAllText(gridPath));
+
+                    warpShapes = SquareDetector.GetShapeFromPoints(quadref.points, quadref.hexcolor, width, height, null);
+                } else
+                {
+                    Bitmap warpedImage = new Bitmap(warpPath);
+
+                    warpShapes = SquareDetector.FindSquare(warpedImage, null);
+                    warpedImage.Dispose();
+                }
+
+                
+                List<KeyValuePair<Shape, Shape>> ShapeList = FindPairing(gridShapes, warpShapes);
 
                 Transformer transformerobj;
                 switch (transformer)
@@ -86,21 +123,16 @@ namespace CardMaker
                         throw new InvalidDataException("Invalid transformer argument");
                 }
 
-                List<KeyValuePair<Shape, Shape>> ShapeList = CreateShapeMapping(origImage, warpedImage, null, null);
-
-                Dictionary<Point, Point> mapping = GenerateMapping(ShapeList, transformerobj, origImage.Width, origImage.Height);
-                MyJSON.SaveMapping(origImage.Width, origImage.Height, mapping, transformer, mappingPath, metadataPath);
-
-                origImage.Dispose();
-                warpedImage.Dispose();
+                Dictionary<Point, Point> mapping = GenerateMapping(ShapeList, transformerobj, width, height);
+                MyJSON.SaveMapping(width, height, mapping, transformer, mappingPath, metadataPath);
             }
         }
 
-        private static List<KeyValuePair<Shape, Shape>> CreateShapeMapping(Bitmap origImage, Bitmap warpedImage, string origOut, string warpOut)
-        {
-            List<Shape> OriginalShapes = SquareDetector.FindSquare(origImage, origOut);
-            List<Shape> WarpedSquares = SquareDetector.FindSquare(warpedImage, warpOut);
 
+
+
+        private static List<KeyValuePair<Shape, Shape>> FindPairing(List<Shape> OriginalShapes, List<Shape> WarpedSquares)
+        {
             List<KeyValuePair<Shape, Shape>> ShapeList = new List<KeyValuePair<Shape, Shape>>();
             foreach (Shape shape in OriginalShapes)
             {

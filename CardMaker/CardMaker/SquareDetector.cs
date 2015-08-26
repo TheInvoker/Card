@@ -65,6 +65,33 @@ namespace CardMaker
             return ListSquares;
         }
 
+        public static List<Shape> GetShapeFromPoints(List<List<int>> points, string hexcolor, int width, int height, string outName)
+        {
+            List<Pixel> square = new List<Pixel>();
+            ColorConverter cc = new ColorConverter();
+            Color color = (Color) cc.ConvertFromString(hexcolor);
+
+            Pixel[] corners = new Pixel[4];
+            corners[0] = new Pixel(color, points.ElementAt(0).ElementAt(0), points.ElementAt(0).ElementAt(1));
+            corners[1] = new Pixel(color, points.ElementAt(1).ElementAt(0), points.ElementAt(1).ElementAt(1));
+            corners[2] = new Pixel(color, points.ElementAt(2).ElementAt(0), points.ElementAt(2).ElementAt(1));
+            corners[3] = new Pixel(color, points.ElementAt(3).ElementAt(0), points.ElementAt(3).ElementAt(1));
+
+            for (int x=0; x< width; x+=1)
+            {
+                for(int y=0;y< height;y+=1)
+                {
+                    if () // TODO: implement check for point in quad
+                    {
+                        square.Add(new Pixel(color, x, y));
+                    }
+                }
+            }
+
+            Shape shape = new Shape(square, corners);
+            return new List<Shape>() { shape };
+        }
+
         private static Pixel[] GetCorners(Bitmap image, List<Pixel> square)
         {
             // top left, top right, bottom left, bottom right
