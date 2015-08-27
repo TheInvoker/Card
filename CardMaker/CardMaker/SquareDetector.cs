@@ -71,17 +71,22 @@ namespace CardMaker
             ColorConverter cc = new ColorConverter();
             Color color = (Color) cc.ConvertFromString(hexcolor);
 
+            Point p0 = new Point(points.ElementAt(0).ElementAt(0), points.ElementAt(0).ElementAt(1));
+            Point p1 = new Point(points.ElementAt(1).ElementAt(0), points.ElementAt(1).ElementAt(1));
+            Point p2 = new Point(points.ElementAt(2).ElementAt(0), points.ElementAt(2).ElementAt(1));
+            Point p3 = new Point(points.ElementAt(3).ElementAt(0), points.ElementAt(3).ElementAt(1));
+
             Pixel[] corners = new Pixel[4];
-            corners[0] = new Pixel(color, points.ElementAt(0).ElementAt(0), points.ElementAt(0).ElementAt(1));
-            corners[1] = new Pixel(color, points.ElementAt(1).ElementAt(0), points.ElementAt(1).ElementAt(1));
-            corners[2] = new Pixel(color, points.ElementAt(2).ElementAt(0), points.ElementAt(2).ElementAt(1));
-            corners[3] = new Pixel(color, points.ElementAt(3).ElementAt(0), points.ElementAt(3).ElementAt(1));
+            corners[0] = new Pixel(color, p0.X, p0.Y);
+            corners[1] = new Pixel(color, p1.X, p1.Y);
+            corners[2] = new Pixel(color, p2.X, p2.Y);
+            corners[3] = new Pixel(color, p3.X, p3.Y);
 
             for (int x=0; x< width; x+=1)
             {
                 for(int y=0;y< height;y+=1)
                 {
-                    if () // TODO: implement check for point in quad
+                    if (PointChecker.PointInQuad(new Point(x, y), p0, p1, p2, p3))
                     {
                         square.Add(new Pixel(color, x, y));
                     }

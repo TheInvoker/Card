@@ -21,8 +21,8 @@ namespace CardMaker
                     if (template.active)
                     {
                         BatchGenerateMapping(
-                            root + template.grid,
-                            root + template.warp,
+                            template.grid.StartsWith("{") ? template.grid : root + template.grid,
+                            template.warp.StartsWith("{") ? template.warp : root + template.warp,
                             template.transformer,
                             root + template.mapping,
                             root + template.metadata
@@ -71,9 +71,9 @@ namespace CardMaker
                 List<Shape> gridShapes, warpShapes;
                 QuadRef quadref;
 
-                if (gridPath.StartsWith("["))
+                if (gridPath.StartsWith("{"))
                 {
-                    quadref = JsonConvert.DeserializeObject<QuadRef>(File.ReadAllText(gridPath));
+                    quadref = JsonConvert.DeserializeObject<QuadRef>(gridPath);
                     List<List<int>> points = quadref.points;
                     List<int> p1 = points.ElementAt(0);
                     List<int> p2 = points.ElementAt(1);
@@ -91,9 +91,9 @@ namespace CardMaker
                     gridShapes = SquareDetector.FindSquare(origImage, null);
                     origImage.Dispose();
                 }
-                if (warpPath.StartsWith("["))
+                if (warpPath.StartsWith("{"))
                 {
-                    quadref = JsonConvert.DeserializeObject<QuadRef>(File.ReadAllText(gridPath));
+                    quadref = JsonConvert.DeserializeObject<QuadRef>(warpPath);
 
                     warpShapes = SquareDetector.GetShapeFromPoints(quadref.points, quadref.hexcolor, width, height, null);
                 } else

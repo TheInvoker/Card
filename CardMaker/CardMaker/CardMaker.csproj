@@ -57,6 +57,7 @@
     <Compile Include="Json\TemplateRef.cs" />
     <Compile Include="Json\TemplateRefList.cs" />
     <Compile Include="Json\QuadRef.cs" />
+    <Compile Include="PointChecker.cs" />
     <Compile Include="Transformer\Bilinear.cs" />
     <Compile Include="Transformer\OneFiveOrderPoly.cs" />
     <Compile Include="Transformer\Perspective.cs" />
