@@ -9,9 +9,10 @@ namespace CardMaker
 {
     class Program
     {
+        private const string root = "../../../../../PlutoMakeJava/PlutoMakeJava/bin/";
+
         static void Main(string[] args)
         {
-            string root = "../../../../../PlutoMakeJava/PlutoMakeJava/bin/";
             List<TemplateRefList> files = JsonConvert.DeserializeObject<List<TemplateRefList>>(File.ReadAllText(root + "master.js"));
 
             foreach (TemplateRefList templatelist in files)
@@ -65,46 +66,20 @@ namespace CardMaker
 
         private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
-            if (true || !CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
+            Boolean isGridJSON = gridPath.Contains("{");
+            Boolean isWarpJSON = warpPath.Contains("{");
+
+            if (!CanSkip(isGridJSON ? null : gridPath, isWarpJSON ? null : warpPath, transformer, mappingPath, metadataPath))
             {
-                int width, height;
-                List<Shape> gridShapes, warpShapes;
-                QuadRef quadref;
+                KeyValuePair<List<Shape>, int[]> gridData = GetShapes(isGridJSON, gridPath);
+                KeyValuePair<List<Shape>, int[]> warpData = GetShapes(isWarpJSON, warpPath);
 
-                if (gridPath.StartsWith("{"))
-                {
-                    quadref = JsonConvert.DeserializeObject<QuadRef>(gridPath);
-                    List<List<int>> points = quadref.points;
-                    List<int> p1 = points.ElementAt(0);
-                    List<int> p2 = points.ElementAt(1);
-                    List<int> p3 = points.ElementAt(2);
-                    width = p2.ElementAt(0) - p1.ElementAt(0) + 1;
-                    height = p3.ElementAt(1) - p2.ElementAt(1) + 1;
+                List<Shape> gridShapes = gridData.Key;
+                int[] gridDim = gridData.Value;
 
-                    gridShapes = SquareDetector.GetShapeFromPoints(points, quadref.hexcolor, width, height, null);
-                } else
-                {
-                    Bitmap origImage = new Bitmap(gridPath);
-                    width = origImage.Width;
-                    height = origImage.Height;
+                List<Shape> warpShapes = warpData.Key;
+                int[] warpDim = warpData.Value;
 
-                    gridShapes = SquareDetector.FindSquare(origImage, null);
-                    origImage.Dispose();
-                }
-                if (warpPath.StartsWith("{"))
-                {
-                    quadref = JsonConvert.DeserializeObject<QuadRef>(warpPath);
-
-                    warpShapes = SquareDetector.GetShapeFromPoints(quadref.points, quadref.hexcolor, width, height, null);
-                } else
-                {
-                    Bitmap warpedImage = new Bitmap(warpPath);
-
-                    warpShapes = SquareDetector.FindSquare(warpedImage, null);
-                    warpedImage.Dispose();
-                }
-
-                
                 List<KeyValuePair<Shape, Shape>> ShapeList = FindPairing(gridShapes, warpShapes);
 
                 Transformer transformerobj;
@@ -123,13 +98,25 @@ namespace CardMaker
                         throw new InvalidDataException("Invalid transformer argument");
                 }
 
-                Dictionary<Point, Point> mapping = GenerateMapping(ShapeList, transformerobj, width, height);
-                MyJSON.SaveMapping(width, height, mapping, transformer, mappingPath, metadataPath);
+                Dictionary<Point, Point> mapping = GenerateMapping(ShapeList, transformerobj, gridDim[0], gridDim[1]);
+                MyJSON.SaveMapping(gridDim[0], gridDim[1], mapping, transformer, mappingPath, metadataPath);
             }
         }
 
 
-
+        private static KeyValuePair<List<Shape>, int[]> GetShapes(Boolean isJSON, string gridPath)
+        {
+            Grid grid;
+            if (isJSON)
+            {
+                grid = new GridJson();
+            }
+            else
+            {
+                grid = new GridImage();
+            }
+            return grid.GetShapes(gridPath);
+        }
 
         private static List<KeyValuePair<Shape, Shape>> FindPairing(List<Shape> OriginalShapes, List<Shape> WarpedSquares)
         {

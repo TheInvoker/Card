@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CardMaker
+﻿namespace CardMaker
 {
     class Solver
     {
@@ -15,11 +9,12 @@ namespace CardMaker
                 for (int k = 0; k < X_.GetLength(0); k++)
                     X[l, k] = X_[k, l];
 
-
             double[,] originalX = (double[,]) X.Clone();
 
             ComputeCoefficents(X, Y);
         }
+
+        // https://social.msdn.microsoft.com/Forums/en-US/70408584-668d-49a0-b179-fabf101e71e9/solution-of-linear-equations-systems?forum=Vsexpressvcs
 
         public static void ComputeCoefficents(double[,] X, double[] Y)
         {
