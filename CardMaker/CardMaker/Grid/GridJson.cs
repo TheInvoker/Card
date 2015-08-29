@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CardMaker
@@ -10,9 +11,7 @@ namespace CardMaker
 
         public override KeyValuePair<List<Shape>, int[]> GetShapes(string gridPath)
         {
-            gridPath = gridPath.Substring(gridPath.IndexOf("{"));
-
-            QuadRef quadref = JsonConvert.DeserializeObject<QuadRef>(gridPath);
+            QuadRef quadref = JsonConvert.DeserializeObject<QuadRef>(File.ReadAllText(gridPath));
             List<List<int>> points = quadref.points;
 
             List<int> p1 = points.ElementAt(0);

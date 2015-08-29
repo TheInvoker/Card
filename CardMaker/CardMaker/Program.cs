@@ -22,8 +22,8 @@ namespace CardMaker
                     if (template.active)
                     {
                         BatchGenerateMapping(
-                            template.grid.StartsWith("{") ? template.grid : root + template.grid,
-                            template.warp.StartsWith("{") ? template.warp : root + template.warp,
+                            root + template.grid,
+                            root + template.warp,
                             template.transformer,
                             root + template.mapping,
                             root + template.metadata
@@ -35,6 +35,7 @@ namespace CardMaker
             Console.WriteLine("Complete!");
             Console.ReadLine();
         }
+
 
         private static Boolean CanSkip(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
@@ -66,19 +67,21 @@ namespace CardMaker
 
         private static void BatchGenerateMapping(string gridPath, string warpPath, string transformer, string mappingPath, string metadataPath)
         {
-            Boolean isGridJSON = gridPath.Contains("{");
-            Boolean isWarpJSON = warpPath.Contains("{");
-
-            if (!CanSkip(isGridJSON ? null : gridPath, isWarpJSON ? null : warpPath, transformer, mappingPath, metadataPath))
+            if (!CanSkip(gridPath, warpPath, transformer, mappingPath, metadataPath))
             {
-                KeyValuePair<List<Shape>, int[]> gridData = GetShapes(isGridJSON, gridPath);
-                KeyValuePair<List<Shape>, int[]> warpData = GetShapes(isWarpJSON, warpPath);
+                KeyValuePair<List<Shape>, int[]> gridData = GetShapes(gridPath);
+                KeyValuePair<List<Shape>, int[]> warpData = GetShapes(warpPath);
 
                 List<Shape> gridShapes = gridData.Key;
                 int[] gridDim = gridData.Value;
 
                 List<Shape> warpShapes = warpData.Key;
                 int[] warpDim = warpData.Value;
+
+                if (gridDim[0] != warpDim[0] || gridDim[1] != warpDim[1])
+                {
+                    throw new InvalidDataException("Grid and Warp images are not same dimensions");
+                }
 
                 List<KeyValuePair<Shape, Shape>> ShapeList = FindPairing(gridShapes, warpShapes);
 
@@ -104,9 +107,10 @@ namespace CardMaker
         }
 
 
-        private static KeyValuePair<List<Shape>, int[]> GetShapes(Boolean isJSON, string gridPath)
+        private static KeyValuePair<List<Shape>, int[]> GetShapes(string gridPath)
         {
             Grid grid;
+            Boolean isJSON = gridPath.ToLower().EndsWith(".js");
             if (isJSON)
             {
                 grid = new GridJson();
