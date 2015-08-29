@@ -55,7 +55,7 @@
     <Compile Include="Grid\Grid.cs" />
     <Compile Include="Grid\GridImage.cs" />
     <Compile Include="Grid\GridJson.cs" />
-    <Compile Include="MetaDataRef.cs" />
+    <Compile Include="Json\MetaDataRef.cs" />
     <Compile Include="MyJSON.cs" />
     <Compile Include="Json\TemplateRef.cs" />
     <Compile Include="Json\TemplateRefList.cs" />

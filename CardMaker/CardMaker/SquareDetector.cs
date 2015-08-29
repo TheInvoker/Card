@@ -40,7 +40,9 @@ namespace CardMaker
                         List<Pixel> square = BFS(logoImage, randomPoint.X, randomPoint.Y, squareCount);
                         Pixel[] corners = GetCorners(logoImage, square);
 
-                        ListSquares.Add(new Shape(square, corners));
+                        Shape shape = new Shape(square, corners);
+                        shape.CalculateCorners();
+                        ListSquares.Add(shape);
 
                         Console.WriteLine(string.Format("Square size was {0}", square.Count));
 
