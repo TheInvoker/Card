@@ -1,54 +1,142 @@
 var http = require('http')
  , fs = require('fs')
- , request = require('request')
- , qs = require('querystring')
  , multiparty = require('multiparty')
  , spawn = require('child_process').spawn
  , uuid = require('node-uuid'); 
  
- 
- 
-var masterArray = [];
-setInterval(function() {
-	fs.readFile('master.js', function (err, data) {
-		if (err) {
-			console.log("Couldn't read from master.js")
-		} else {
-			var _masterArray = JSON.parse(data);
-			
-			var Temp_masterArray = [];
-			_masterArray.forEach(function(_templateListObj) {
-				
-				var Temp_templateList = [];
-				_templateListObj.angles.forEach(function(_templateObj) {
-					if (_templateObj.active) {
-						Temp_templateList.push(_templateObj);
-					}
-				});
-				
-				if (Temp_templateList.length > 0) {
-					_templateListObj.angles = Temp_templateList;
-					Temp_masterArray.push(_templateListObj);
-				}
-			});
-			
-			masterArray = Temp_masterArray;
-		}
-	});
-}, 1000);
 
-
+// variables
+var html = "";
 var clientIDObject = {};
 var resultObject = {};
+var masterArray = [];
 
-var html = "";
-fs.readFile('./index.html', function (err, data) {
-	if (err) {
-		console.log("Error reading html file...");
+// paths
+var MASTER_PATH = 'master.js';
+var HOME_PATH = 'index.html';
+
+// helper functions
+function log(str) {
+	console.log(str);
+} 
+function cleanInActiveTeplates(_masterArray) {
+	var Temp_masterArray = [];
+	_masterArray.forEach(function(_templateListObj) {
+		
+		var Temp_templateList = [];
+		_templateListObj.angles.forEach(function(_templateObj) {
+			if (_templateObj.active) {
+				Temp_templateList.push(_templateObj);
+			}
+		});
+		
+		if (Temp_templateList.length > 0) {
+			_templateListObj.angles = Temp_templateList;
+			Temp_masterArray.push(_templateListObj);
+		}
+	});
+	
+	return Temp_masterArray;
+} 
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+function readMaster() {
+	//log("About to read master.js");
+	fs.exists(MASTER_PATH, function(exists) {
+		if (exists) {
+			fs.readFile(MASTER_PATH, function (err, data) {
+				if (err) {
+					log("Couldn't read from master.js");
+				} else {
+					var _masterArray;
+					try {
+						_masterArray = JSON.parse(data);
+					} catch(err) {
+						_masterArray = [];
+						log("JSON error when parsing master.js");
+					}
+					masterArray = cleanInActiveTeplates(_masterArray);
+				}
+			});
+		} else {
+			log("master.js does not exist")
+		}
+	});
+}
+function cleanOldFiles() {
+	log("cleaning old files");
+	
+	var i,j,k,l = masterArray.length;
+	for(i=0; i<l; i+=1) {
+		var llistobj = masterArray[i];
+		var llist = llistobj.angles;
+		k = llist.length;
+		for(j=0;j<k;j+=1) {
+			var resultDir = llist[j].result;
+			fs.readdir(resultDir, function(err, files) {
+				if (err) {
+					
+				} 
+				else {
+					files.forEach(function(file, index) {
+						var filePath = "./" + resultDir + file;
+
+						fs.exists(filePath, function(exists) {
+							if (exists) {
+								fs.stat(filePath, function(err, stat) {
+									if (err) {
+										log(err);
+									} 
+									else {
+										var endTime, now;
+										now = new Date().getTime();
+										endTime = new Date(stat.ctime).getTime() + 600000;
+										
+										if (now > endTime) {
+											fs.unlink(filePath, function(){
+												//log("deleted file: '" + filePath + "'");
+											});
+										}
+									}
+								});
+							}
+						});
+					});
+				}
+			});
+		}
+	}
+}
+
+setInterval(function() {
+	readMaster();
+}, 1000 * 60);
+readMaster();
+
+setInterval(function() {
+	cleanOldFiles();
+}, 1000 * 60 * 10);
+cleanOldFiles();
+
+fs.exists(HOME_PATH, function(exists) {
+	if (exists) {
+		fs.readFile(HOME_PATH, function (err, data) {
+			if (err) {
+				log("Error reading index.html file...");
+			} else {
+				html = data.toString();
+			}
+		});
 	} else {
-		html = data.toString();
+		log("index.html does not exist")
 	}
 });
+
+
+ 
+
+ 
  
  
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -80,64 +168,150 @@ function GetURLSegments(request) {
     return segments;
 }
 
-function getURLParameter(link, name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(link)||[,""])[1].replace(/\+/g, '%20'))||null;
-}
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
+// get first angle of each template in the specified page
 function getTemplateLinks(res, page) {
 	var i, l = masterArray.length, s = 12;
 	var result = [];
-	for(i=page*s; i<Math.min(l, (page+1)*s); i+=1) {
+	for(i = Math.max(0, page * s); i < Math.min(l, (page + 1) * s); i += 1) {
 		var templateObj = masterArray[i].angles[0];
 		result.push({
 			"id" : masterArray[i].id,
 			"title" : masterArray[i].title,
 			"description" : masterArray[i].description,
-			"url" : templateObj.template
+			"url" : templateObj.template,
+			"angle_id" : templateObj.id
 		});
 	}
 	return result;
 }
 
-function getCreatedLink(templateName, newFilename) {
+function getCreatedLink(templateName, newFilename, angle_id, handler) {
 	var i,j,k,l = masterArray.length;
 	for(i=0; i<l; i+=1) {
 		var llistobj = masterArray[i];
-		
 		if (llistobj.id == templateName) {
 			var llist = llistobj.angles;
 			k = llist.length;
-			for(j=0;j<k;j+=1) {				
-				var newLink = llist[j].result + newFilename;
-				if (fs.existsSync(newLink)) {
-					return newLink;
+			for(j=0;j<k;j+=1) {
+				if (llist[j].id == angle_id) {
+					var newLink = llist[j].result + newFilename;
+					return handler(newLink);
 				}
 			}
 		}
 	}
-	return null;
+	handler(null);
 }
 
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+
+
+		
+function handleImage(res, file, templateName, clientID, angle_id) {
+	var newFilename = uuid.v4()+'.png';
+	var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename, templateName, angle_id]);
+	
+	child.on('close', function (exitCode) {
+		fs.unlink(file.path, function(){
+		});
+		
+		if (exitCode === 0) {
+			
+			log("finished with code: " + exitCode);
+			
+			getCreatedLink(templateName, newFilename, angle_id, function(createdlink) {
+				
+				if (createdlink != null)  {
+					fs.exists(createdlink, function(exists) {
+						if (exists) {
+							
+							// cache result link
+							var a, b;
+							if (clientID in resultObject) {
+								a = resultObject[clientID];
+							} else {
+								resultObject[clientID] = {};
+								a = resultObject[clientID];
+							}
+							if (templateName in a) {
+								b = a[templateName];
+							} else {
+								a[templateName] = {};
+								b = a[templateName];
+							}
+							b[angle_id] = createdlink;
+							
+							// send back file
+							fs.readFile(createdlink, function(err, data) {
+								if (err) {
+									log("couldn't read generated file");
+									
+									WriteHeaderMode('image/png', res, 200);
+									res.end("", 'binary');
+								} else {
+									WriteHeaderMode('image/png', res, 200);
+									res.end(data, 'binary');
+								}
+							});
+						} 
+						
+						else {
+							log("created file not found: '" + createdlink + "'");
+							
+							WriteHeaderMode('image/png', res, 200);
+							res.end("", 'binary');
+						}
+					});
+				} 
+				
+				else {
+					log("created file not found: '" + createdlink + "'");
+			
+					WriteHeaderMode('image/png', res, 200);
+					res.end("", 'binary');
+				}
+			});
+		} 
+		
+		else {	
+			log('Something went wrong!');
+			
+			WriteHeaderMode('image/png', res, 200);
+			res.end("", 'binary');
+		}
+	});
+
+	// If you’re really just passing it through, though, pass {stdio: 'inherit'}
+	// to child_process.spawn instead.
+	child.stderr.on('data', function (data) {
+		fs.unlink(file.path, function(){
+		});
+		
+		process.stderr.write(data);
+		
+		WriteHeaderMode('image/png', res, 200);
+		res.end("", 'binary');
+	});
 }
 
 
 var PORT = 41302;
 http.createServer(function (req, res) {
+
     // get the array of parameters
 	var paramsArray = GetURLSegments(req);
 	var segmentLength = paramsArray.length;
 	
-	//console.log("hi: " + req.url);
-	
-	if (segmentLength > 0) {
+	if (segmentLength == 0) {
+		WriteHeaderMode('text/html', res, 200);
+		res.end(html);
+	} else {
 		
+		// at least 2
 		if (segmentLength > 1) {
 
 			if (paramsArray[0] == "template" && !isNaN(paramsArray[1])) {
@@ -146,175 +320,109 @@ http.createServer(function (req, res) {
 				
 				WriteHeaderMode('text/html', res, 200);
 				res.end(result);
-			} else if (paramsArray[0] == "template" || paramsArray[0] == "result") {
+			} 
+			
+			else if (paramsArray[0] == "template" || paramsArray[0] == "result") {
 				var requestURL = "." + req.url.toLowerCase();
 
-				if (fs.existsSync(requestURL) && (
-					endsWith(requestURL, ".png") ||
-					endsWith(requestURL, ".jpg") || 
-					endsWith(requestURL, ".jpeg")
-					))  {
-					fs.readFile(requestURL, function(err, data) {
-						if (err) {
-							WriteHeaderMode('text/html', res, 200);
-							res.end("[]");
-						} else {
-							WriteHeaderMode('image/png', res, 200);
-							res.end(data, 'binary');
-						}
-					});
-				} else {
-					WriteHeaderMode('text/html', res, 200);
-					res.end("[]");
-				}
-			}
-		} else if (paramsArray[0] == "process") {
-            var form = new multiparty.Form();
-            form.parse(req, function(err, fields, files) {
-				var clientID = fields["clientID"][0];
-				var templateName = fields["templateName"][0];
-				var modTime = fields["modTime"][0];
-				
-				var file = null;
-				if (files["fileToUpload"] && files["fileToUpload"].length > 0) {
-					file = files["fileToUpload"][0];
-					
-					console.log("Detected image: " + file.path);
-					
-					if (clientID in clientIDObject) {
-						clientIDObject[clientID].push([file.path, modTime]);
-					} else {
-						clientIDObject[clientID] = [[file.path, modTime]];
-					}
-				} else {
-					console.log("Trying to use saved image with mod time: " + modTime);
-
-					if (clientID in clientIDObject) {
-						var arr = clientIDObject[clientID];
-						for(var i=0;i<arr.length;i+=1) {
-							if (arr[i][1] == modTime) {
-								var savedPath = arr[i][0];
-								if (fs.existsSync(savedPath)) {
-									console.log("Found the image");
-									file = {
-										"path" : savedPath
-									}
-								}
-								break;
-							}
-						}
-					}
-				}
-
-				if (file == null) {
-					WriteHeaderMode('image/png', res, 200);
-					res.end("", 'binary');
-				} else {
-				
-					
-					if (clientID in resultObject && templateName in resultObject[clientID] && modTime in resultObject[clientID][templateName]) {
-						var createdlink = resultObject[clientID][templateName][modTime];
-						if (fs.existsSync(createdlink)) {
-							fs.readFile(createdlink, function(err, data) {
+				if (endsWith(requestURL, ".png") || endsWith(requestURL, ".jpg") || endsWith(requestURL, ".jpeg"))  {
+					fs.exists(requestURL, function(exists) {
+						if (exists) {
+							fs.readFile(requestURL, function(err, data) {
 								if (err) {
-									console.log("coldn't read");
 									WriteHeaderMode('image/png', res, 200);
 									res.end("", 'binary');
-								} else {
-									console.log("found generated image");
+								} 
+								
+								else {
 									WriteHeaderMode('image/png', res, 200);
 									res.end(data, 'binary');
 								}
 							});
-						} else {
+						} 
+						
+						else {
 							WriteHeaderMode('image/png', res, 200);
 							res.end("", 'binary');
 						}
-					} else {
+					});
+				} 
+				
+				else {
+					WriteHeaderMode('image/png', res, 200);
+					res.end("", 'binary');
+				}
+			}
+			
+			else {
+				WriteHeaderMode('text/html', res, 200);
+				res.end();
+			}
+		}
+		
+		else if (segmentLength == 1) {
+			if (paramsArray[0] == "process") {
+				
+				var form = new multiparty.Form();
+				form.parse(req, function(err, fields, files) {
 					
+					var clientID = fields["clientID"][0];
+					var templateName = fields["templateName"][0];
+					var angle_id = fields["angleID"][0];
 					
-						var newFilename = uuid.v4()+'.png';
-						var child = spawn('java', ['-cp', 'java-json.jar:.', 'PlutoMake', file.path, newFilename, templateName]);
+					if (files["fileToUpload"] && files["fileToUpload"].length > 0) {
+						var file = files["fileToUpload"][0];
+						log("Detected image: " + file.path);
 						
-						child.on('close', function (exitCode) {
-							//fs.unlink(file.path, function(){
-							//});
-							
-							if (exitCode === 0) {
-								console.log("finished with code: " + exitCode);
-								
-								var createdlink = getCreatedLink(templateName, newFilename);
-								
-								var a, b;
-								if (clientID in resultObject) {
-									a = resultObject[clientID];
-								} else {
-									resultObject[clientID] = {};
-									a = resultObject[clientID];
-								}
-								if (templateName in a) {
-									b = a[templateName];
-								} else {
-									a[templateName] = {};
-									b = a[templateName];
-								}
-								b[modTime] = createdlink;
-								//console.log(JSON.stringify(resultObject));
-								
-								if (createdlink != null)  {
+						if (clientID in resultObject && templateName in resultObject[clientID] && angle_id in resultObject[clientID][templateName]) {
+							var createdlink = resultObject[clientID][templateName][angle_id];
+							fs.exists(createdlink, function(exists) {
+								if (exists) {
 									fs.readFile(createdlink, function(err, data) {
 										if (err) {
-											console.log("coldn't read");
-											WriteHeaderMode('text/html', res, 200);
-											res.end("[]");
-										} else {
+											handleImage(res, file, templateName, clientID, angle_id);
+										} 
+										
+										else {
+											log("found generated file");
+											
 											WriteHeaderMode('image/png', res, 200);
 											res.end(data, 'binary');
 										}
 									});
-								} else {
-									console.log("created file not found");
-									WriteHeaderMode('text/html', res, 200);
-									res.end("[]");
-								}
-
-							} else {	
-								console.error('Something went wrong!');
+								} 
 								
-								WriteHeaderMode('text/html', res, 200);
-								res.end("[]");
-							}
-						});
-
-						// If you’re really just passing it through, though, pass {stdio: 'inherit'}
-						// to child_process.spawn instead.
-						child.stderr.on('data', function (data) {
-							fs.unlink(file.path, function(){
+								else {
+									handleImage(res, file, templateName, clientID, angle_id);
+								}
 							});
-							
-							process.stderr.write(data);
-							
-							WriteHeaderMode('text/html', res, 200);
-							res.end("[]");
-						});
+						} 
+						
+						else {
+							handleImage(res, file, templateName, clientID, angle_id);
+						}
 					}
-				}
-            });
-            form.on('error', function(err) {
-				console.log(JSON.stringify(err));
+				});
+				
+				form.on('error', function(err) {
+					log(JSON.stringify(err));
+					WriteHeaderMode('text/html', res, 200);
+					res.end();
+				});
+			} 
+			
+			else {
 				WriteHeaderMode('text/html', res, 200);
-				res.end("[]");
-            });
-		} else {
-			WriteHeaderMode('text/html', res, 200);
-			res.end("[]");
+				res.end();
+			}
 		}
-	} else {
-		// send back the index.html page
-		WriteHeaderMode('text/html', res, 200);
-		res.end(html);
+		
+		else {
+			WriteHeaderMode('text/html', res, 200);
+			res.end();
+		}
 	}
 }).listen(PORT);
 
-//console.log('Server running at http://127.0.0.1:' + PORT + '/');
-console.log('Server running at cms-chorus.utsc.utoronto.ca:' + PORT + '/');
+//log('Server running at http://127.0.0.1:' + PORT + '/');
+log('Server running at cms-chorus.utsc.utoronto.ca:' + PORT + '/');

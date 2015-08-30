@@ -2,6 +2,7 @@
 {
     public class TemplateRef
     {
+        public int id { get; set; }
         public string grid { get; set; }
         public string warp { get; set; }
         public string template { get; set; }

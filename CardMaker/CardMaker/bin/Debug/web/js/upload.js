@@ -4,6 +4,7 @@ function sendData(formData) {
 	
 	formData.append('templateName', id);
 	formData.append('clientID', myClientID);
+	formData.append('angleID', angle_id);
 
 	$.ajax({
 		type: 'POST',
@@ -19,15 +20,10 @@ function sendData(formData) {
 			$("div.row.all-previews").html("<img class=\"all-previews-loader\" src='images/icons/loader.gif'></img>");
 		},
 		success: function(blob,status,xhr) {
-			if (blob.byteLength == 0) {
-				localStorage.removeItem("uploadFile");
-				alert("Image was deleted from server, please upload again");
-			} else {
-				$("div.row.all-previews").html("<div class='col-md-8 preview'><img src='data:image/png;base64," + _arrayBufferToBase64(blob) + "'/></div>");
-			}
+			$("div.row.all-previews").html("<div class='col-md-8 preview'><img src='data:image/png;base64," + _arrayBufferToBase64(blob) + "'/></div>");
 		},
 		error: function(data,status,xhr) {
-			alert(xhr);
+			$("div.row.all-previews").html(xhr);
 		}
 	});
 }
@@ -75,26 +71,8 @@ $(document).ready(function() {
 
     $("#upload").on('submit', function() {
 		var file = $("#uploadfield")[0].files[0];
-		var fileSTR = getStrOfFile(file);
-
-		var formData = new FormData(this);
 		
-		if (localStorage.getItem("uploadFile") == null) {
-			localStorage.setItem("uploadFile", JSON.stringify([fileSTR]));
-			alert("uploading image");
-		} else {
-			var lst = JSON.parse(localStorage.getItem("uploadFile"));
-			if (lst.indexOf(fileSTR) != -1) {
-				formData = new FormData();
-				alert("not uploading image");
-			} else {
-				lst.push(fileSTR);
-				localStorage.setItem("uploadFile", JSON.stringify(lst));
-				alert("uploading image");
-			}
-		}
-
-		formData.append('modTime', fileSTR);
+		var formData = new FormData(this);
         sendData(formData);
 		
         return false;
@@ -114,23 +92,9 @@ $(document).ready(function() {
 
         var files = event.dataTransfer.files;
 		var file = files[0];
-		var fileSTR = getStrOfFile(file);
-		
+
 		var formImage = new FormData();
-		
-		if (localStorage.getItem("uploadFile") == null) {
-			localStorage.setItem("uploadFile", JSON.stringify([fileSTR]));
-			formImage.append('fileToUpload', file);
-		} else {
-			var lst = JSON.parse(localStorage.getItem("uploadFile"));
-			if (lst.indexOf(fileSTR) == -1) {
-				lst.push(fileSTR);
-				localStorage.setItem("uploadFile", JSON.stringify(lst));
-				formImage.append('fileToUpload', file);
-			}
-		}
-		
-		formImage.append('modTime', fileSTR);
+		formImage.append('fileToUpload', file);
         sendData(formImage);
 
         return false;
@@ -153,10 +117,6 @@ $(document).ready(function() {
 	$("div.breadcrumbs span").last().text(title);
 });
 
-function getStrOfFile(file) {
-	return file.lastModified;
-}
-
 // http://stackoverflow.com/a/9458996/128597
 function _arrayBufferToBase64(buffer) {
 	var binary = '';
@@ -174,12 +134,10 @@ function getClientID() {
 	});
 }
 
-function getURLParameter(link, name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(link)||[,""])[1].replace(/\+/g, '%20'))||null;
-}
 
 var myClientID = getClientID();
 var id = localStorage.getItem("id");
 var url = localStorage.getItem("url");
 var title = localStorage.getItem("title");
 var description = localStorage.getItem("description");
+var angle_id = localStorage.getItem("angle_id");
